@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- These tags force the iPad to run the site as a Full-Screen App -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hindustan Bakery Quotes</title>
+    <style>
+        :root {
+            --brand-maroon: #731213;
+            --brand-gold: #FCB644;
+            --bg-color: #fdfaf4;
+            --text-dark: #333;
+        }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--bg-color); color: var(--text-dark); padding-bottom: 40px; }
+        
+        /* Header & Logo */
+        .header { background: var(--brand-maroon); color: var(--brand-gold); padding: 15px 20px; display: flex; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header img { max-height: 50px; }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
+
+        /* Navigation Tabs */
+        .tabs { display: flex; background: #e0d0c0; }
+        .tab { flex: 1; text-align: center; padding: 15px; font-size: 18px; font-weight: bold; color: var(--brand-maroon); cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab.active { background: var(--brand-maroon); color: var(--brand-gold); border-bottom: 3px solid var(--brand-gold); }
+
+        /* Content Areas */
+        .container { padding: 20px; max-width: 800px; margin: 0 auto; display: none; }
+        .container.active { display: block; }
+        
+        .section-title { color: var(--brand-maroon); border-bottom: 2px solid var(--brand-gold); padding-bottom: 5px; margin-top: 0; }
+
+        /* Form Inputs */
+        .form-group { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--brand-maroon); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        label { font-size: 18px; font-weight: 500; width: 60%; }
+        select, input[type="number"] { font-size: 18px; padding: 10px; border: 2px solid var(--brand-maroon); border-radius: 6px; width: 35%; background: var(--bg-color); color: var(--text-dark); font-weight: bold; text-align: center; }
+        
+        button { background: var(--brand-maroon); color: var(--brand-gold); border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 6px rgba(115, 18, 19, 0.3); }
+        button:active { opacity: 0.8; transform: scale(0.98); }
+
+        /* Receipt Breakdown */
+        .receipt { background: var(--brand-maroon); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; }
+        .receipt h2 { color: var(--brand-gold); text-align: center; margin-top: 0; }
+        .line-item { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
+        .grand-total { font-size: 26px; font-weight: bold; color: var(--brand-gold); border-top: 1px dashed var(--brand-gold); padding-top: 15px; margin-top: 10px; display: flex; justify-content: space-between; }
+        .deposit { font-size: 20px; color: white; display: flex; justify-content: space-between; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="logo.png" alt="Hindustan Bakery Since 1963">
+        <h1>HINDUSTAN BAKERY</h1>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('calculator')">Calculator</div>
+        <div class="tab" onclick="switchTab('admin')">Admin Settings</div>
+    </div>
+
+    <!-- CALCULATOR SCREEN -->
+    <div id="calculator" class="container active">
+        <h2 class="section-title">Base Cake Specifications</h2>
+        
+        <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="calc-weight" value="1" step="0.5" min="0.5" onchange="runQuote()">
+        </div>
+        
+        <div class="form-group">
+            <label>Cake Style</label>
+            <select id="calc-style" onchange="runQuote()">
+                <option value="normalStyle">Normal Cake</option>
+                <option value="coolStyle">Cool Cake</option>
+                <option value="fondantStyle">Full Fondant Base</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Flavor Profile</label>
+            <select id="calc-flavor" onchange="runQuote()">
+                <option value="vanilla">Vanilla</option>
+                <option value="strawberry">Strawberry</option>
+                <option value="chocolate">Chocolate</option>
+                <option value="redVelvet">Red Velvet</option>
+                <option value="chocoChip">Choco Chip</option>
+                <option value="rasmalai">Rasmalai</option>
+            </select>
+        </div>
+
+        <h2 class="section-title" style="margin-top:20px;">Design & Add-ons</h2>
+        
+        <div class="form-group">
+            <label>2D Fondant Details (Qty)</label>
+            <input type="number" id="calc-2d" value="0" min="0" onchange="runQuote()">
+        </div>
+        <div class="form-group">
+            <label>3D Fondant Sculptures (Qty)</label>
+            <input type="number" id="calc-3d" value="0" min="0" onchange="runQuote()">
+        </div>
+        <div class="form-group">
+            <label>Basic Add-ons (Qty)</label>
+            <input type="number" id="calc-add50" value="0" min="0" onchange="runQuote()">
+        </div>
+        <div class="form-group">
+            <label>Premium Add-ons (Qty)</label>
+            <input type="number" id="calc-add200" value="0" min="0" onchange="runQuote()">
+        </div>
+        <div class="form-group" style="border-left-color: #333;">
+            <label>Hidden / Extra Charges (₹)</label>
+            <input type="number" id="calc-extra" value="0" min="0" onchange="runQuote()">
+        </div>
+
+        <div class="receipt">
+            <h2>ORDER QUOTE</h2>
+            <div class="line-item"><span>Base Cake Cost:</span> <span id="out-base">₹0</span></div>
+            <div class="line-item"><span>Design & Add-ons:</span> <span id="out-custom">₹0</span></div>
+            <div class="line-item"><span>Additional Charges:</span> <span id="out-extra">₹0</span></div>
+            <div class="grand-total"><span>GRAND TOTAL:</span> <span id="out-total">₹0</span></div>
+            <div class="deposit"><span>Required 50% Advance:</span> <span id="out-deposit">₹0</span></div>
+        </div>
+        
+        <button onclick="runQuote()">Refresh Quote</button>
+    </div>
+
+    <!-- ADMIN SETTINGS SCREEN -->
+    <div id="admin" class="container">
+        <h2 class="section-title">Edit Flavor Prices (Per Kg)</h2>
+        <div class="form-group"><label>Vanilla</label><input type="number" id="set-vanilla"></div>
+        <div class="form-group"><label>Strawberry</label><input type="number" id="set-strawberry"></div>
+        <div class="form-group"><label>Chocolate</label><input type="number" id="set-chocolate"></div>
+        <div class="form-group"><label>Red Velvet</label><input type="number" id="set-redVelvet"></div>
+        <div class="form-group"><label>Choco Chip</label><input type="number" id="set-chocoChip"></div>
+        <div class="form-group"><label>Rasmalai</label><input type="number" id="set-rasmalai"></div>
+
+        <h2 class="section-title" style="margin-top:20px;">Edit Style Fees (Per Kg Added)</h2>
+        <div class="form-group"><label>Normal Cake Extra</label><input type="number" id="set-normalStyle"></div>
+        <div class="form-group"><label>Cool Cake Extra</label><input type="number" id="set-coolStyle"></div>
+        <div class="form-group"><label>Fondant Base Extra</label><input type="number" id="set-fondantStyle"></div>
+
+        <h2 class="section-title" style="margin-top:20px;">Edit Design Prices (Flat Fee)</h2>
+        <div class="form-group"><label>2D Detail Rate</label><input type="number" id="set-art2D"></div>
+        <div class="form-group"><label>3D Sculpture Rate</label><input type="number" id="set-art3D"></div>
+        <div class="form-group"><label>Basic Add-on Rate</label><input type="number" id="set-add50"></div>
+        <div class="form-group"><label>Premium Add-on Rate</label><input type="number" id="set-add200"></div>
+
+        <button onclick="saveAdminPrices()">Save System Prices</button>
+    </div>
+
+    <script>
+        // 1. Default fallback prices if the iPad has never saved them before
+        const defaultPrices = {
+            vanilla: 700, strawberry: 750, chocolate: 1000, redVelvet: 1200, chocoChip: 1300, rasmalai: 1400,
+            normalStyle: 0, coolStyle: 100, fondantStyle: 300, art2D: 150, art3D: 450, add50: 50, add200: 200
+        };
+
+        // 2. Load prices from iPad local storage, or use defaults
+        let activePrices = JSON.parse(localStorage.getItem('hindustanPrices')) || defaultPrices;
+
+        // 3. Tab Switching Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if(tabName === 'admin') loadAdminFields();
+            if(tabName === 'calculator') runQuote();
+        }
+
+        // 4. Populate Admin Screen with current active prices
+        function loadAdminFields() {
+            for (let key in activePrices) {
+                let inputField = document.getElementById('set-' + key);
+                if(inputField) inputField.value = activePrices[key];
+            }
+        }
+
+        // 5. Save changes from Admin Screen back to iPad memory
+        function saveAdminPrices() {
+            for (let key in activePrices) {
+                let inputField = document.getElementById('set-' + key);
+                if(inputField) activePrices[key] = parseInt(inputField.value) || 0;
+            }
+            localStorage.setItem('hindustanPrices', JSON.stringify(activePrices));
+            alert("Prices Updated Successfully!");
+            switchTab('calculator');
+        }
+
+        // 6. The Core Math Engine for the Quote
+        function runQuote() {
+            // Get inputs
+            let kg = parseFloat(document.getElementById('calc-weight').value) || 0;
+            let flavorKey = document.getElementById('calc-flavor').value;
+            let styleKey = document.getElementById('calc-style').value;
+            
+            // Calculate Base Cost
+            let flavorRate = activePrices[flavorKey] || 0;
+            let styleRate = activePrices[styleKey] || 0;
+            let baseTotal = kg * (flavorRate + styleRate);
+
+            // Calculate Design Cost
+            let q2D = parseInt(document.getElementById('calc-2d').value) || 0;
+            let q3D = parseInt(document.getElementById('calc-3d').value) || 0;
+            let qAdd50 = parseInt(document.getElementById('calc-add50').value) || 0;
+            let qAdd200 = parseInt(document.getElementById('calc-add200').value) || 0;
+            let extraCharge = parseInt(document.getElementById('calc-extra').value) || 0;
+
+            let designTotal = (q2D * activePrices.art2D) + (q3D * activePrices.art3D) + 
+                              (qAdd50 * activePrices.add50) + (qAdd200 * activePrices.add200);
+
+            // Print to Receipt
+            document.getElementById('out-base').innerText = '₹' + baseTotal;
+            document.getElementById('out-custom').innerText = '₹' + designTotal;
+            document.getElementById('out-extra').innerText = '₹' + extraCharge;
+            document.getElementById('out-total').innerText = '₹' + (baseTotal + designTotal + extraCharge);
+            document.getElementById('out-deposit').innerText = '₹' + ((baseTotal + designTotal + extraCharge) / 2);
+        }
+
+        // Initialize on load
+        runQuote();
+    </script>
+</body>
+</html>
