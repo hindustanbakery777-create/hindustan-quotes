@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- These tags force the iPad to run the site as a Full-Screen App -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,36 +15,51 @@
         }
         body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--bg-color); color: var(--text-dark); padding-bottom: 40px; }
         
-        /* Header & Logo */
         .header { background: var(--brand-maroon); color: var(--brand-gold); padding: 15px 20px; display: flex; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .header img { max-height: 50px; }
         .header h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
 
-        /* Navigation Tabs */
         .tabs { display: flex; background: #e0d0c0; }
         .tab { flex: 1; text-align: center; padding: 15px; font-size: 18px; font-weight: bold; color: var(--brand-maroon); cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { background: var(--brand-maroon); color: var(--brand-gold); border-bottom: 3px solid var(--brand-gold); }
 
-        /* Content Areas */
         .container { padding: 20px; max-width: 800px; margin: 0 auto; display: none; }
         .container.active { display: block; }
         
         .section-title { color: var(--brand-maroon); border-bottom: 2px solid var(--brand-gold); padding-bottom: 5px; margin-top: 0; }
 
-        /* Form Inputs */
         .form-group { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--brand-maroon); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        label { font-size: 18px; font-weight: 500; width: 60%; }
-        select, input[type="number"] { font-size: 18px; padding: 10px; border: 2px solid var(--brand-maroon); border-radius: 6px; width: 35%; background: var(--bg-color); color: var(--text-dark); font-weight: bold; text-align: center; }
+        label { font-size: 16px; font-weight: bold; width: 50%; }
         
-        button { background: var(--brand-maroon); color: var(--brand-gold); border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 6px rgba(115, 18, 19, 0.3); }
-        button:active { opacity: 0.8; transform: scale(0.98); }
+        input[type="text"], select, input[type="number"] { font-size: 16px; padding: 10px; border: 2px solid var(--brand-maroon); border-radius: 6px; background: var(--bg-color); color: var(--text-dark); font-weight: bold; text-align: center; width: 100%; box-sizing: border-box;}
+        .input-wrapper { width: 45%; }
+        
+        /* Touch-friendly + and - buttons */
+        .qty-control { display: flex; align-items: center; justify-content: space-between; width: 45%; }
+        .qty-btn { background: var(--brand-maroon); color: var(--brand-gold); border: none; font-size: 20px; font-weight: bold; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .qty-btn:active { transform: scale(0.95); }
+        .qty-control input[type="number"] { width: 50%; margin: 0 5px; }
 
-        /* Receipt Breakdown */
-        .receipt { background: var(--brand-maroon); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; }
+        button.primary-btn { background: var(--brand-maroon); color: var(--brand-gold); border: none; padding: 15px 20px; font-size: 18px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 6px rgba(115, 18, 19, 0.3); }
+        button.primary-btn:active { opacity: 0.8; transform: scale(0.98); }
+        
+        button.add-btn { background: #28a745; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        button.delete-btn { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: 10px; }
+
+        .receipt { background: var(--brand-maroon); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; border: 2px solid var(--brand-gold); }
         .receipt h2 { color: var(--brand-gold); text-align: center; margin-top: 0; }
+        .receipt-header { border-bottom: 1px dashed var(--brand-gold); padding-bottom: 10px; margin-bottom: 15px; }
         .line-item { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
-        .grand-total { font-size: 26px; font-weight: bold; color: var(--brand-gold); border-top: 1px dashed var(--brand-gold); padding-top: 15px; margin-top: 10px; display: flex; justify-content: space-between; }
-        .deposit { font-size: 20px; color: white; display: flex; justify-content: space-between; margin-top: 10px; font-weight: bold; }
+        .grand-total { font-size: 24px; font-weight: bold; color: var(--brand-gold); border-top: 1px dashed var(--brand-gold); padding-top: 15px; margin-top: 10px; display: flex; justify-content: space-between; }
+        
+        /* Print Styles - Hides everything except the receipt when printing/saving to PDF */
+        @media print {
+            body { background: white; padding: 0; }
+            .header, .tabs, .form-group, .section-title, button { display: none !important; }
+            .receipt { display: block; background: white; color: black; border: 2px solid black; margin: 0; width: 100%; }
+            .receipt h2, .grand-total { color: black; }
+            .receipt-header, .grand-total { border-color: black; }
+        }
     </style>
 </head>
 <body>
@@ -62,165 +76,266 @@
 
     <!-- CALCULATOR SCREEN -->
     <div id="calculator" class="container active">
-        <h2 class="section-title">Base Cake Specifications</h2>
+        <h2 class="section-title">Order Details</h2>
+        
+        <div class="form-group">
+            <label>Customer Name</label>
+            <div class="input-wrapper"><input type="text" id="calc-name" placeholder="Name" onchange="runQuote()"></div>
+        </div>
+        <div class="form-group">
+            <label>Order Number</label>
+            <div class="input-wrapper"><input type="text" id="calc-order" placeholder="#000" onchange="runQuote()"></div>
+        </div>
+
+        <h2 class="section-title" style="margin-top:20px;">Cake Specifications</h2>
         
         <div class="form-group">
             <label>Weight (kg)</label>
-            <input type="number" id="calc-weight" value="1" step="0.5" min="0.5" onchange="runQuote()">
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adj('calc-weight', -0.5)">-</button>
+                <input type="number" id="calc-weight" value="1" step="0.5" min="0.5" onchange="runQuote()">
+                <button class="qty-btn" onclick="adj('calc-weight', 0.5)">+</button>
+            </div>
         </div>
         
         <div class="form-group">
-            <label>Cake Style</label>
-            <select id="calc-style" onchange="runQuote()">
-                <option value="normalStyle">Normal Cake</option>
-                <option value="coolStyle">Cool Cake</option>
-                <option value="fondantStyle">Full Fondant Base</option>
-            </select>
+            <label>Flavor Profile</label>
+            <div class="input-wrapper"><select id="calc-flavor" onchange="runQuote()"></select></div>
         </div>
 
         <div class="form-group">
-            <label>Flavor Profile</label>
-            <select id="calc-flavor" onchange="runQuote()">
-                <option value="vanilla">Vanilla</option>
-                <option value="strawberry">Strawberry</option>
-                <option value="chocolate">Chocolate</option>
-                <option value="redVelvet">Red Velvet</option>
-                <option value="chocoChip">Choco Chip</option>
-                <option value="rasmalai">Rasmalai</option>
-            </select>
+            <label>Cake Style</label>
+            <div class="input-wrapper">
+                <select id="calc-style" onchange="runQuote()">
+                    <option value="normalStyle">Normal Cake</option>
+                    <option value="coolStyle">Cool Cake</option>
+                    <option value="fondantStyle">Full Fondant Base</option>
+                </select>
+            </div>
         </div>
 
         <h2 class="section-title" style="margin-top:20px;">Design & Add-ons</h2>
         
         <div class="form-group">
             <label>2D Fondant Details (Qty)</label>
-            <input type="number" id="calc-2d" value="0" min="0" onchange="runQuote()">
-        </div>
-        <div class="form-group">
-            <label>3D Fondant Sculptures (Qty)</label>
-            <input type="number" id="calc-3d" value="0" min="0" onchange="runQuote()">
-        </div>
-        <div class="form-group">
-            <label>Basic Add-ons (Qty)</label>
-            <input type="number" id="calc-add50" value="0" min="0" onchange="runQuote()">
-        </div>
-        <div class="form-group">
-            <label>Premium Add-ons (Qty)</label>
-            <input type="number" id="calc-add200" value="0" min="0" onchange="runQuote()">
-        </div>
-        <div class="form-group" style="border-left-color: #333;">
-            <label>Hidden / Extra Charges (₹)</label>
-            <input type="number" id="calc-extra" value="0" min="0" onchange="runQuote()">
-        </div>
-
-        <div class="receipt">
-            <h2>ORDER QUOTE</h2>
-            <div class="line-item"><span>Base Cake Cost:</span> <span id="out-base">₹0</span></div>
-            <div class="line-item"><span>Design & Add-ons:</span> <span id="out-custom">₹0</span></div>
-            <div class="line-item"><span>Additional Charges:</span> <span id="out-extra">₹0</span></div>
-            <div class="grand-total"><span>GRAND TOTAL:</span> <span id="out-total">₹0</span></div>
-            <div class="deposit"><span>Required 50% Advance:</span> <span id="out-deposit">₹0</span></div>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adj('calc-2d', -1)">-</button>
+                <input type="number" id="calc-2d" value="0" min="0" onchange="runQuote()">
+                <button class="qty-btn" onclick="adj('calc-2d', 1)">+</button>
+            </div>
         </div>
         
-        <button onclick="runQuote()">Refresh Quote</button>
+        <div class="form-group">
+            <label>3D Sculptures (Qty)</label>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adj('calc-3d', -1)">-</button>
+                <input type="number" id="calc-3d" value="0" min="0" onchange="runQuote()">
+                <button class="qty-btn" onclick="adj('calc-3d', 1)">+</button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Basic Add-ons (Qty)</label>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adj('calc-add50', -1)">-</button>
+                <input type="number" id="calc-add50" value="0" min="0" onchange="runQuote()">
+                <button class="qty-btn" onclick="adj('calc-add50', 1)">+</button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Premium Add-ons (Qty)</label>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adj('calc-add200', -1)">-</button>
+                <input type="number" id="calc-add200" value="0" min="0" onchange="runQuote()">
+                <button class="qty-btn" onclick="adj('calc-add200', 1)">+</button>
+            </div>
+        </div>
+        
+        <div class="form-group" style="border-left-color: #333;">
+            <label>Extra Charges (₹)</label>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adj('calc-extra', -50)">-</button>
+                <input type="number" id="calc-extra" value="0" min="0" onchange="runQuote()">
+                <button class="qty-btn" onclick="adj('calc-extra', 50)">+</button>
+            </div>
+        </div>
+
+        <!-- RECEIPT AREA -->
+        <div class="receipt" id="receipt-box">
+            <h2>ORDER QUOTE</h2>
+            <div class="receipt-header">
+                <div class="line-item"><span>Customer:</span> <span id="out-name">---</span></div>
+                <div class="line-item"><span>Order No:</span> <span id="out-order">---</span></div>
+                <div class="line-item"><span>Specs:</span> <span id="out-specs">---</span></div>
+            </div>
+            <div class="line-item"><span>Base Cake Cost:</span> <span id="out-base">₹0</span></div>
+            <div class="line-item"><span>Design & Extras:</span> <span id="out-custom">₹0</span></div>
+            <div class="grand-total"><span>GRAND TOTAL:</span> <span id="out-total">₹0</span></div>
+            <div class="line-item" style="margin-top:10px; font-weight:bold;"><span>50% Advance Required:</span> <span id="out-deposit">₹0</span></div>
+        </div>
+        
+        <button class="primary-btn" onclick="window.print()" style="background:#FCB644; color:#731213;">🖨️ Print / Share to Kitchen</button>
     </div>
 
     <!-- ADMIN SETTINGS SCREEN -->
     <div id="admin" class="container">
-        <h2 class="section-title">Edit Flavor Prices (Per Kg)</h2>
-        <div class="form-group"><label>Vanilla</label><input type="number" id="set-vanilla"></div>
-        <div class="form-group"><label>Strawberry</label><input type="number" id="set-strawberry"></div>
-        <div class="form-group"><label>Chocolate</label><input type="number" id="set-chocolate"></div>
-        <div class="form-group"><label>Red Velvet</label><input type="number" id="set-redVelvet"></div>
-        <div class="form-group"><label>Choco Chip</label><input type="number" id="set-chocoChip"></div>
-        <div class="form-group"><label>Rasmalai</label><input type="number" id="set-rasmalai"></div>
+        <h2 class="section-title">Manage Flavors (Per Kg)</h2>
+        <div id="admin-flavors-list"></div>
+        
+        <div class="form-group" style="background:#e0d0c0;">
+            <input type="text" id="new-flavor-name" placeholder="New Flavor Name" style="width:45%;">
+            <input type="number" id="new-flavor-price" placeholder="Price/Kg" style="width:30%;">
+            <button class="add-btn" onclick="addFlavor()">Add</button>
+        </div>
 
-        <h2 class="section-title" style="margin-top:20px;">Edit Style Fees (Per Kg Added)</h2>
-        <div class="form-group"><label>Normal Cake Extra</label><input type="number" id="set-normalStyle"></div>
-        <div class="form-group"><label>Cool Cake Extra</label><input type="number" id="set-coolStyle"></div>
-        <div class="form-group"><label>Fondant Base Extra</label><input type="number" id="set-fondantStyle"></div>
+        <h2 class="section-title" style="margin-top:20px;">Edit Style Fees (Per Kg Extra)</h2>
+        <div class="form-group"><label>Normal Cake Extra</label><div class="input-wrapper"><input type="number" id="set-normalStyle"></div></div>
+        <div class="form-group"><label>Cool Cake Extra</label><div class="input-wrapper"><input type="number" id="set-coolStyle"></div></div>
+        <div class="form-group"><label>Fondant Base Extra</label><div class="input-wrapper"><input type="number" id="set-fondantStyle"></div></div>
 
         <h2 class="section-title" style="margin-top:20px;">Edit Design Prices (Flat Fee)</h2>
-        <div class="form-group"><label>2D Detail Rate</label><input type="number" id="set-art2D"></div>
-        <div class="form-group"><label>3D Sculpture Rate</label><input type="number" id="set-art3D"></div>
-        <div class="form-group"><label>Basic Add-on Rate</label><input type="number" id="set-add50"></div>
-        <div class="form-group"><label>Premium Add-on Rate</label><input type="number" id="set-add200"></div>
+        <div class="form-group"><label>2D Detail Rate</label><div class="input-wrapper"><input type="number" id="set-art2D"></div></div>
+        <div class="form-group"><label>3D Sculpture Rate</label><div class="input-wrapper"><input type="number" id="set-art3D"></div></div>
+        <div class="form-group"><label>Basic Add-on Rate</label><div class="input-wrapper"><input type="number" id="set-add50"></div></div>
+        <div class="form-group"><label>Premium Add-on Rate</label><div class="input-wrapper"><input type="number" id="set-add200"></div></div>
 
-        <button onclick="saveAdminPrices()">Save System Prices</button>
+        <button class="primary-btn" onclick="saveAdminPrices()">Save All System Prices</button>
     </div>
 
     <script>
-        // 1. Default fallback prices if the iPad has never saved them before
-        const defaultPrices = {
-            vanilla: 700, strawberry: 750, chocolate: 1000, redVelvet: 1200, chocoChip: 1300, rasmalai: 1400,
-            normalStyle: 0, coolStyle: 100, fondantStyle: 300, art2D: 150, art3D: 450, add50: 50, add200: 200
+        // Data Structure Upgrade: Dynamic Flavors
+        const defaultData = {
+            flavors: { "Vanilla": 700, "Strawberry": 750, "Chocolate": 1000, "Red Velvet": 1200, "Choco Chip": 1300, "Rasmalai": 1400 },
+            fees: { normalStyle: 0, coolStyle: 100, fondantStyle: 300, art2D: 150, art3D: 450, add50: 50, add200: 200 }
         };
 
-        // 2. Load prices from iPad local storage, or use defaults
-        let activePrices = JSON.parse(localStorage.getItem('hindustanPrices')) || defaultPrices;
+        let activeData = JSON.parse(localStorage.getItem('hindustanV4')) || defaultData;
 
-        // 3. Tab Switching Logic
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
-
+            
             if(tabName === 'admin') loadAdminFields();
-            if(tabName === 'calculator') runQuote();
+            if(tabName === 'calculator') {
+                populateFlavorDropdown();
+                runQuote();
+            }
         }
 
-        // 4. Populate Admin Screen with current active prices
+        // +/- Button logic
+        function adj(id, amount) {
+            let el = document.getElementById(id);
+            let val = parseFloat(el.value) || 0;
+            val += amount;
+            if(val < (el.min || 0)) val = el.min || 0;
+            el.value = val;
+            runQuote();
+        }
+
+        function populateFlavorDropdown() {
+            let dropdown = document.getElementById('calc-flavor');
+            let currentSelection = dropdown.value;
+            dropdown.innerHTML = '';
+            for (let flavorName in activeData.flavors) {
+                let opt = document.createElement('option');
+                opt.value = flavorName;
+                opt.innerText = flavorName;
+                dropdown.appendChild(opt);
+            }
+            if (activeData.flavors[currentSelection]) dropdown.value = currentSelection;
+        }
+
         function loadAdminFields() {
-            for (let key in activePrices) {
+            // Load fixed fees
+            for (let key in activeData.fees) {
                 let inputField = document.getElementById('set-' + key);
-                if(inputField) inputField.value = activePrices[key];
+                if(inputField) inputField.value = activeData.fees[key];
+            }
+            // Load dynamic flavors
+            let list = document.getElementById('admin-flavors-list');
+            list.innerHTML = '';
+            for (let flavorName in activeData.flavors) {
+                list.innerHTML += `
+                <div class="form-group">
+                    <label>${flavorName}</label>
+                    <div class="input-wrapper" style="display:flex; justify-content:space-between;">
+                        <input type="number" id="flavor-edit-${flavorName}" value="${activeData.flavors[flavorName]}" style="width:70%;">
+                        <button class="delete-btn" onclick="deleteFlavor('${flavorName}')">X</button>
+                    </div>
+                </div>`;
             }
         }
 
-        // 5. Save changes from Admin Screen back to iPad memory
-        function saveAdminPrices() {
-            for (let key in activePrices) {
-                let inputField = document.getElementById('set-' + key);
-                if(inputField) activePrices[key] = parseInt(inputField.value) || 0;
+        function addFlavor() {
+            let name = document.getElementById('new-flavor-name').value.trim();
+            let price = parseInt(document.getElementById('new-flavor-price').value) || 0;
+            if(name !== "") {
+                activeData.flavors[name] = price;
+                document.getElementById('new-flavor-name').value = "";
+                document.getElementById('new-flavor-price').value = "";
+                loadAdminFields();
             }
-            localStorage.setItem('hindustanPrices', JSON.stringify(activePrices));
-            alert("Prices Updated Successfully!");
+        }
+
+        function deleteFlavor(name) {
+            if(confirm("Remove " + name + "?")) {
+                delete activeData.flavors[name];
+                loadAdminFields();
+            }
+        }
+
+        function saveAdminPrices() {
+            // Save fixed fees
+            for (let key in activeData.fees) {
+                let inputField = document.getElementById('set-' + key);
+                if(inputField) activeData.fees[key] = parseInt(inputField.value) || 0;
+            }
+            // Save updated flavor prices
+            for (let flavorName in activeData.flavors) {
+                let inputField = document.getElementById('flavor-edit-' + flavorName);
+                if(inputField) activeData.flavors[flavorName] = parseInt(inputField.value) || 0;
+            }
+            localStorage.setItem('hindustanV4', JSON.stringify(activeData));
+            alert("Prices Updated!");
             switchTab('calculator');
         }
 
-        // 6. The Core Math Engine for the Quote
         function runQuote() {
-            // Get inputs
             let kg = parseFloat(document.getElementById('calc-weight').value) || 0;
             let flavorKey = document.getElementById('calc-flavor').value;
             let styleKey = document.getElementById('calc-style').value;
             
-            // Calculate Base Cost
-            let flavorRate = activePrices[flavorKey] || 0;
-            let styleRate = activePrices[styleKey] || 0;
+            let flavorRate = activeData.flavors[flavorKey] || 0;
+            let styleRate = activeData.fees[styleKey] || 0;
             let baseTotal = kg * (flavorRate + styleRate);
 
-            // Calculate Design Cost
             let q2D = parseInt(document.getElementById('calc-2d').value) || 0;
             let q3D = parseInt(document.getElementById('calc-3d').value) || 0;
             let qAdd50 = parseInt(document.getElementById('calc-add50').value) || 0;
             let qAdd200 = parseInt(document.getElementById('calc-add200').value) || 0;
             let extraCharge = parseInt(document.getElementById('calc-extra').value) || 0;
 
-            let designTotal = (q2D * activePrices.art2D) + (q3D * activePrices.art3D) + 
-                              (qAdd50 * activePrices.add50) + (qAdd200 * activePrices.add200);
+            let designTotal = (q2D * activeData.fees.art2D) + (q3D * activeData.fees.art3D) + 
+                              (qAdd50 * activeData.fees.add50) + (qAdd200 * activeData.fees.add200) + extraCharge;
 
-            // Print to Receipt
+            // Receipt Text Updates
+            document.getElementById('out-name').innerText = document.getElementById('calc-name').value || "Walk-in";
+            document.getElementById('out-order').innerText = document.getElementById('calc-order').value || "Pending";
+            
+            let styleText = document.getElementById('calc-style').options[document.getElementById('calc-style').selectedIndex].text;
+            document.getElementById('out-specs').innerText = `${kg}kg ${flavorKey} (${styleText})`;
+
             document.getElementById('out-base').innerText = '₹' + baseTotal;
             document.getElementById('out-custom').innerText = '₹' + designTotal;
-            document.getElementById('out-extra').innerText = '₹' + extraCharge;
-            document.getElementById('out-total').innerText = '₹' + (baseTotal + designTotal + extraCharge);
-            document.getElementById('out-deposit').innerText = '₹' + ((baseTotal + designTotal + extraCharge) / 2);
+            document.getElementById('out-total').innerText = '₹' + (baseTotal + designTotal);
+            document.getElementById('out-deposit').innerText = '₹' + ((baseTotal + designTotal) / 2);
         }
 
-        // Initialize on load
+        // Initialize
+        populateFlavorDropdown();
         runQuote();
     </script>
 </body>
