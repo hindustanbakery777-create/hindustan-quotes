@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hindustan Bakery POS & KOT</title>
+    <title>Hindustan Bakery KOT System</title>
     <style>
         :root {
             --brand-maroon: #731213;
@@ -13,557 +13,455 @@
             --bg-color: #fdfaf4;
             --text-dark: #333;
         }
-        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--bg-color); color: var(--text-dark); padding-bottom: 40px; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
         
-        .header { background: var(--brand-maroon); color: var(--brand-gold); padding: 15px 20px; display: flex; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header img { max-height: 50px; }
-        .header h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
-
+        .header { background: var(--brand-maroon); color: var(--brand-gold); padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
         .tabs { display: flex; background: #e0d0c0; }
         .tab { flex: 1; text-align: center; padding: 15px; font-size: 16px; font-weight: bold; color: var(--brand-maroon); cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { background: var(--brand-maroon); color: var(--brand-gold); border-bottom: 3px solid var(--brand-gold); }
 
-        .container { padding: 20px; max-width: 800px; margin: 0 auto; display: none; }
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; display: none; }
         .container.active { display: block; }
         
-        .section-title { color: var(--brand-maroon); border-bottom: 2px solid var(--brand-gold); padding-bottom: 5px; margin-top: 0; }
+        .section-title { color: var(--brand-maroon); border-bottom: 2px solid var(--brand-gold); padding-bottom: 5px; margin-top: 15px; }
 
-        /* Form Inputs Layout */
-        .form-group { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--brand-maroon); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        label { font-size: 16px; font-weight: bold; width: 50%; }
+        .form-group { display: flex; flex-direction: column; background: white; padding: 12px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--brand-maroon); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .form-row { display: flex; justify-content: space-between; align-items: center; }
+        label { font-size: 16px; font-weight: bold; color: var(--brand-maroon); margin-bottom: 5px; }
         
-        input[type="text"], input[type="tel"], select, input[type="number"], textarea { font-size: 16px; padding: 10px; border: 2px solid var(--brand-maroon); border-radius: 6px; background: var(--bg-color); color: var(--text-dark); font-weight: bold; width: 100%; box-sizing: border-box; }
-        textarea { resize: vertical; min-height: 80px; }
-        .input-wrapper { width: 45%; }
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], select, textarea { font-size: 16px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #fff; width: 100%; box-sizing: border-box; }
         
-        /* Buttons */
-        .qty-control { display: flex; align-items: center; justify-content: space-between; width: 45%; }
+        /* Qty Controls */
+        .qty-wrapper { display: flex; align-items: center; justify-content: flex-end; width: 100%; gap: 10px; }
         .qty-btn { background: var(--brand-maroon); color: var(--brand-gold); border: none; font-size: 20px; font-weight: bold; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; }
-        .qty-btn:active { transform: scale(0.95); }
-        .qty-control input[type="number"] { width: 50%; margin: 0 5px; text-align: center; }
+        .qty-wrapper input { width: 80px; text-align: center; font-weight: bold; }
 
-        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
-        button.primary-btn { flex: 1; background: var(--brand-maroon); color: var(--brand-gold); border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        button.action-btn { flex: 1; background: #28a745; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        /* Buttons */
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button.primary-btn { background: var(--brand-maroon); color: var(--brand-gold); border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; flex: 1; cursor: pointer; }
+        button.customer-btn { background: #28a745; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; flex: 1; cursor: pointer; }
+        button.reset-btn { background: #dc3545; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; width: 100%; margin-top: 15px; cursor: pointer; }
         
-        button.add-btn { background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        button.delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        /* Sketchpad */
+        canvas { border: 2px dashed #999; background: #fff; width: 100%; height: 250px; touch-action: none; border-radius: 8px; }
+        .preview-imgs { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .preview-imgs img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
 
-        /* Canvas & Images */
-        .canvas-container { border: 2px dashed var(--brand-maroon); background: white; border-radius: 8px; margin-bottom: 10px; overflow: hidden; position: relative; }
-        canvas { width: 100%; height: 250px; display: block; touch-action: none; }
-        .clear-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        
-        /* Receipt & KOT Output Views (Hidden until printed) */
-        #print-view { display: none; }
+        /* Print Output Elements - Hidden during normal app use */
+        #print-customer-receipt, #print-kot-receipt { display: none; }
 
-        /* --- PRINT LOGIC --- */
+        /* PRINT MEDIA QUERIES - FORCES 80mm THERMAL WIDTH */
         @media print {
-            body { background: white; padding: 0; color: black; }
-            .header, .tabs, .container { display: none !important; }
-            #print-view { display: block !important; width: 100%; }
-
-            /* Customer Receipt Layout */
-            body.print-receipt #customer-receipt { display: block; max-width: 80mm; margin: 0 auto; font-family: monospace; font-size: 14px; }
-            body.print-receipt #kot-ticket { display: none; }
-            .receipt-logo { text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 18px; }
-            .receipt-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
-            .receipt-divider { border-top: 1px dashed black; margin: 10px 0; }
-            .receipt-total { font-size: 18px; font-weight: bold; }
-
-            /* KOT Layout */
-            body.print-kot #kot-ticket { display: block; width: 100%; }
-            body.print-kot #customer-receipt { display: none; }
-            .kot-header { font-size: 24px; font-weight: bold; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 10px; }
-            .kot-specs { font-size: 18px; margin-bottom: 15px; }
-            .kot-images { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
-            .kot-images img { max-width: 30%; border: 1px solid #ccc; }
-            .kot-sketch { width: 80%; border: 1px solid black; margin-top: 10px; }
-            .kot-notes { font-size: 16px; border: 1px dashed black; padding: 10px; margin-top: 10px; }
+            body * { visibility: hidden; }
+            body { background: white; padding: 0; margin: 0; }
+            
+            /* Only show the selected receipt based on the body class */
+            body.print-customer #print-customer-receipt, body.print-customer #print-customer-receipt * { visibility: visible; display: block; }
+            body.print-kot #print-kot-receipt, body.print-kot #print-kot-receipt * { visibility: visible; display: block; }
+            
+            /* Formatting for thermal roll */
+            #print-customer-receipt, #print-kot-receipt { position: absolute; left: 0; top: 0; width: 80mm; max-width: 80mm; font-family: monospace; font-size: 14px; color: black; background: white; padding: 5px; }
+            
+            .print-header { text-align: center; font-weight: bold; border-bottom: 2px dashed black; padding-bottom: 10px; margin-bottom: 10px; }
+            .print-header h1 { margin: 0; font-size: 20px; }
+            .print-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+            .print-divider { border-top: 1px dashed black; margin: 10px 0; }
+            .print-bold { font-weight: bold; font-size: 16px; }
+            .print-img { max-width: 100%; height: auto; margin-top: 10px; display: block; border: 1px solid black; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="logo.png" alt="Hindustan Bakery Since 1963">
-        <h1>HINDUSTAN BAKERY</h1>
-    </div>
+    <div class="header">HINDUSTAN BAKERY</div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('calculator')">1. Order Intake</div>
-        <div class="tab" onclick="switchTab('visuals')">2. Visuals & Notes</div>
-        <div class="tab" onclick="switchTab('admin')">3. Admin Settings</div>
+        <div class="tab active" onclick="switchTab('order')">Order Intake</div>
+        <div class="tab" onclick="switchTab('visuals')">Visuals & Notes</div>
+        <div class="tab" onclick="switchTab('admin')">Admin Menu</div>
     </div>
 
-    <!-- 1. CALCULATOR SCREEN -->
-    <div id="calculator" class="container active">
-        <h2 class="section-title">Customer Details</h2>
+    <!-- ORDER INTAKE TAB -->
+    <div id="order" class="container active">
         <div class="form-group">
-            <label>Customer Name</label>
-            <div class="input-wrapper"><input type="text" id="calc-name" placeholder="Name"></div>
+            <label>Customer Details</label>
+            <input type="text" id="calc-name" placeholder="Name" style="margin-bottom:8px;">
+            <input type="text" id="calc-phone" placeholder="Phone Number">
         </div>
-        <div class="form-group">
-            <label>Contact Number</label>
-            <div class="input-wrapper"><input type="tel" id="calc-phone" placeholder="Mobile No."></div>
-        </div>
-        <div class="form-group">
-            <label>Order Number</label>
-            <div class="input-wrapper"><input type="text" id="calc-order" placeholder="#000"></div>
-        </div>
-
-        <h2 class="section-title" style="margin-top:20px;">Cake Specifications</h2>
         
         <div class="form-group">
-            <label>Weight (kg)</label>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="adj('calc-weight', -0.5)">-</button>
-                <input type="number" id="calc-weight" value="1" step="0.5" min="0.5" onchange="runQuote()">
-                <button class="qty-btn" onclick="adj('calc-weight', 0.5)">+</button>
+            <div class="form-row">
+                <div style="width:48%;"><label>Order No</label><input type="text" id="calc-order" placeholder="#000"></div>
+                <div style="width:48%;"><label>Delivery Date</label><input type="date" id="calc-del-date"></div>
+            </div>
+            <div class="form-row" style="margin-top:8px;">
+                <div style="width:100%;"><label>Delivery Time</label><input type="time" id="calc-del-time"></div>
             </div>
         </div>
 
+        <h2 class="section-title">Cake Specifications</h2>
+        
         <div class="form-group">
-            <label>Cake Style</label>
-            <div class="input-wrapper">
-                <select id="calc-style" onchange="populateFlavorDropdown(); runQuote();">
-                    <option value="normal">Normal Cake</option>
-                    <option value="cool">Cool Cake</option>
-                    <option value="fondant">Full Fondant Cake</option>
-                </select>
-            </div>
+            <label>Cake Style & Sponge</label>
+            <select id="calc-style" onchange="updateFlavorList(); runQuote();" style="margin-bottom:8px;">
+                <option value="normal">Normal Cake</option>
+                <option value="cool">Cool Cake</option>
+                <option value="fondant">Full Fondant Cake</option>
+            </select>
+            <select id="calc-sponge" onchange="runQuote()">
+                <option value="egg">Egg Based Sponge</option>
+                <option value="eggless">Eggless Sponge (Extra ₹)</option>
+            </select>
         </div>
 
         <div class="form-group">
-            <label>Sponge Type</label>
-            <div class="input-wrapper">
-                <select id="calc-sponge" onchange="runQuote()">
-                    <option value="egg">Egg Based</option>
-                    <option value="eggless">Eggless (+ Surcharge)</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label>Flavor Profile</label>
-            <div class="input-wrapper"><select id="calc-flavor" onchange="runQuote()"></select></div>
+            <label>Flavor</label>
+            <select id="calc-flavor" onchange="runQuote()"></select>
         </div>
 
-        <h2 class="section-title" style="margin-top:20px;">Design & Add-ons</h2>
-        
         <div class="form-group">
-            <label>2D Fondant Details (Qty)</label>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="adj('calc-2d', -1)">-</button>
-                <input type="number" id="calc-2d" value="0" min="0" onchange="runQuote()">
-                <button class="qty-btn" onclick="adj('calc-2d', 1)">+</button>
+            <div class="form-row">
+                <label>Weight (kg)</label>
+                <div class="qty-wrapper">
+                    <button class="qty-btn" onclick="adj('calc-weight', -0.5)">-</button>
+                    <input type="number" id="calc-weight" value="1" step="0.5" min="0.5" onchange="runQuote()">
+                    <button class="qty-btn" onclick="adj('calc-weight', 0.5)">+</button>
+                </div>
             </div>
         </div>
         
         <div class="form-group">
-            <label>3D Sculptures (Qty)</label>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="adj('calc-3d', -1)">-</button>
-                <input type="number" id="calc-3d" value="0" min="0" onchange="runQuote()">
-                <button class="qty-btn" onclick="adj('calc-3d', 1)">+</button>
+            <div class="form-row">
+                <label>2D Fondant Details</label>
+                <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-2d', -1)">-</button><input type="number" id="calc-2d" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-2d', 1)">+</button></div>
             </div>
         </div>
-        
         <div class="form-group">
-            <label>Basic Add-ons (Qty)</label>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="adj('calc-add50', -1)">-</button>
-                <input type="number" id="calc-add50" value="0" min="0" onchange="runQuote()">
-                <button class="qty-btn" onclick="adj('calc-add50', 1)">+</button>
+            <div class="form-row">
+                <label>3D Sculptures</label>
+                <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-3d', -1)">-</button><input type="number" id="calc-3d" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-3d', 1)">+</button></div>
             </div>
         </div>
-        
         <div class="form-group">
-            <label>Premium Add-ons (Qty)</label>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="adj('calc-add200', -1)">-</button>
-                <input type="number" id="calc-add200" value="0" min="0" onchange="runQuote()">
-                <button class="qty-btn" onclick="adj('calc-add200', 1)">+</button>
-            </div>
-        </div>
-        
-        <div class="form-group" style="border-left-color: #333;">
-            <label>Extra Hidden Charges (₹)</label>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="adj('calc-extra', -50)">-</button>
-                <input type="number" id="calc-extra" value="0" min="0" onchange="runQuote()">
-                <button class="qty-btn" onclick="adj('calc-extra', 50)">+</button>
+            <div class="form-row">
+                <label>Premium Add-ons</label>
+                <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-add200', -1)">-</button><input type="number" id="calc-add200" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-add200', 1)">+</button></div>
             </div>
         </div>
 
-        <h2 class="section-title" style="margin-top:20px;">Billing & Payment</h2>
-        <div class="form-group" style="background:#fdfaf4; font-size:18px;">
-            <label>Grand Total:</label>
-            <strong id="ui-grand-total">₹0</strong>
-        </div>
-        <div class="form-group">
-            <label style="color:#28a745;">Advance Received (₹)</label>
-            <div class="input-wrapper"><input type="number" id="calc-advance" onchange="calculateBalance()"></div>
-        </div>
-        <div class="form-group" style="background:#fdfaf4; font-size:18px;">
-            <label style="color:#dc3545;">Balance Due:</label>
-            <strong id="ui-balance-due">₹0</strong>
+        <h2 class="section-title">Billing summary</h2>
+        <div class="form-group" style="background: #f8f9fa;">
+            <div class="form-row" style="margin-bottom:10px;"><label>Grand Total (₹)</label><input type="number" id="out-total" readonly style="width:50%; font-weight:bold; background:#e9ecef;"></div>
+            <div class="form-row" style="margin-bottom:10px;"><label>Advance Paid (₹)</label><input type="number" id="calc-advance" value="0" onchange="calcBalance()" style="width:50%; border:2px solid #28a745;"></div>
+            <div class="form-row"><label>Balance Due (₹)</label><input type="number" id="out-balance" readonly style="width:50%; font-weight:bold; background:#e9ecef;"></div>
         </div>
 
-        <div class="btn-row">
-            <button class="action-btn" onclick="printReceipt()">🖨️ Customer Receipt</button>
-            <button class="primary-btn" onclick="printKOT()">📱 Share KOT (Kitchen)</button>
+        <div class="btn-group">
+            <button class="customer-btn" onclick="printAction('customer')">🖨️ Customer Receipt</button>
+            <button class="primary-btn" onclick="printAction('kot')">🖨️ Kitchen KOT</button>
         </div>
+        <button class="reset-btn" onclick="resetForm()">⚠️ New Order (Clear All)</button>
     </div>
 
-    <!-- 2. VISUALS & NOTES SCREEN -->
+    <!-- VISUALS & NOTES TAB -->
     <div id="visuals" class="container">
-        <h2 class="section-title">Upload Reference Images (Max 3)</h2>
-        <div class="form-group" style="flex-direction:column; align-items:flex-start; gap:10px;">
-            <input type="file" id="img1" accept="image/*" onchange="previewImg(this, 'preview1')">
-            <input type="file" id="img2" accept="image/*" onchange="previewImg(this, 'preview2')">
-            <input type="file" id="img3" accept="image/*" onchange="previewImg(this, 'preview3')">
-        </div>
-
-        <h2 class="section-title" style="margin-top:20px;">Digital Sketchpad</h2>
-        <p style="font-size:14px; margin-top:0;">Draw rough layouts using finger or stylus.</p>
-        <div class="canvas-container">
-            <button class="clear-btn" onclick="clearCanvas()">Clear Canvas</button>
-            <canvas id="sketchpad"></canvas>
-        </div>
-
-        <h2 class="section-title" style="margin-top:20px;">Kitchen Instructions</h2>
-        <textarea id="calc-notes" placeholder="e.g., Use light pastel blue colors. Write 'Happy Birthday Aarohi' in gold."></textarea>
-    </div>
-
-    <!-- 3. ADMIN SETTINGS SCREEN -->
-    <div id="admin" class="container">
-        <h2 class="section-title">Global Settings</h2>
         <div class="form-group">
-            <label>Eggless Surcharge (Per Kg Extra)</label>
-            <div class="input-wrapper"><input type="number" id="set-eggless"></div>
+            <label>Kitchen Notes / Message on Cake</label>
+            <textarea id="calc-notes" rows="3" placeholder="Write any specific design notes or messages here..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Reference Images (Upload max 3)</label>
+            <input type="file" id="calc-images" accept="image/*" multiple onchange="handleImageUpload(event)">
+            <div class="preview-imgs" id="img-preview-container"></div>
         </div>
 
-        <h2 class="section-title" style="margin-top:20px;">Normal Cake Flavors</h2>
-        <div id="list-normal"></div>
-        <div class="form-group" style="background:#e0d0c0;">
-            <input type="text" id="new-name-normal" placeholder="Flavor" style="width:40%;">
-            <input type="number" id="new-price-normal" placeholder="₹/Kg" style="width:30%;">
-            <button class="add-btn" onclick="addFlavor('normal')">Add</button>
-        </div>
-
-        <h2 class="section-title" style="margin-top:20px;">Cool Cake Flavors</h2>
-        <div id="list-cool"></div>
-        <div class="form-group" style="background:#e0d0c0;">
-            <input type="text" id="new-name-cool" placeholder="Flavor" style="width:40%;">
-            <input type="number" id="new-price-cool" placeholder="₹/Kg" style="width:30%;">
-            <button class="add-btn" onclick="addFlavor('cool')">Add</button>
-        </div>
-
-        <h2 class="section-title" style="margin-top:20px;">Full Fondant Flavors</h2>
-        <div id="list-fondant"></div>
-        <div class="form-group" style="background:#e0d0c0;">
-            <input type="text" id="new-name-fondant" placeholder="Flavor" style="width:40%;">
-            <input type="number" id="new-price-fondant" placeholder="₹/Kg" style="width:30%;">
-            <button class="add-btn" onclick="addFlavor('fondant')">Add</button>
-        </div>
-
-        <h2 class="section-title" style="margin-top:20px;">Design Fees (Flat Rate)</h2>
-        <div class="form-group"><label>2D Detail Rate</label><div class="input-wrapper"><input type="number" id="set-art2D"></div></div>
-        <div class="form-group"><label>3D Sculpture Rate</label><div class="input-wrapper"><input type="number" id="set-art3D"></div></div>
-        <div class="form-group"><label>Basic Add-on</label><div class="input-wrapper"><input type="number" id="set-add50"></div></div>
-        <div class="form-group"><label>Premium Add-on</label><div class="input-wrapper"><input type="number" id="set-add200"></div></div>
-
-        <button class="primary-btn" onclick="saveAdminPrices()">Save All System Prices</button>
-    </div>
-
-    <!-- HIDDEN PRINT VIEWS -->
-    <div id="print-view">
-        <!-- 1. Customer Receipt (80mm width standard) -->
-        <div id="customer-receipt">
-            <div class="receipt-logo">HINDUSTAN BAKERY<br><span style="font-size:12px; font-weight:normal;">Since 1963 - Kavali</span></div>
-            <div class="receipt-divider"></div>
-            <div class="receipt-line"><span>Order No:</span> <span id="prnt-order"></span></div>
-            <div class="receipt-line"><span>Customer:</span> <span id="prnt-name"></span></div>
-            <div class="receipt-line"><span>Phone:</span> <span id="prnt-phone"></span></div>
-            <div class="receipt-divider"></div>
-            <div class="receipt-line"><span>Cake Specs:</span> <span id="prnt-specs"></span></div>
-            <div class="receipt-line"><span>Base Price:</span> <span id="prnt-base"></span></div>
-            <div class="receipt-line"><span>Design/Extras:</span> <span id="prnt-design"></span></div>
-            <div class="receipt-divider"></div>
-            <div class="receipt-line receipt-total"><span>GRAND TOTAL:</span> <span id="prnt-total"></span></div>
-            <div class="receipt-line"><span>Advance Paid:</span> <span id="prnt-adv"></span></div>
-            <div class="receipt-line" style="font-weight:bold;"><span>BALANCE DUE:</span> <span id="prnt-bal"></span></div>
-            <div class="receipt-divider"></div>
-            <div style="text-align:center; font-size:12px;">Changes require 72hrs notice.<br>Advance is non-refundable.</div>
-        </div>
-
-        <!-- 2. KOT Document (Digital PDF format) -->
-        <div id="kot-ticket">
-            <div class="kot-header">KOT: <span id="kot-order"></span></div>
-            <div class="kot-specs">
-                <strong>Name:</strong> <span id="kot-name"></span><br>
-                <strong>Specs:</strong> <span id="kot-specs-details"></span><br>
-                <strong>Items:</strong> <span id="kot-items"></span>
-            </div>
-            
-            <strong>Notes:</strong>
-            <div class="kot-notes" id="kot-notes-display">No notes provided.</div>
-
-            <h3 style="margin-bottom:5px;">Digital Sketch:</h3>
-            <img id="kot-canvas-img" class="kot-sketch" src="">
-
-            <h3 style="margin-bottom:5px;">Reference Images:</h3>
-            <div class="kot-images">
-                <img id="preview1" style="display:none;">
-                <img id="preview2" style="display:none;">
-                <img id="preview3" style="display:none;">
-            </div>
+        <div class="form-group">
+            <label>Draw Custom Sketch</label>
+            <canvas id="sketchpad"></canvas>
+            <button onclick="clearCanvas()" style="margin-top:10px; padding:10px; background:#666; color:white; border:none; border-radius:5px;">Clear Drawing</button>
         </div>
     </div>
 
+    <!-- ADMIN TAB -->
+    <div id="admin" class="container">
+        <div class="form-group">
+            <label>Eggless Sponge Extra (₹ per Kg)</label>
+            <input type="number" id="set-eggless" value="100">
+        </div>
+        
+        <div class="form-group">
+            <label>Add New Flavor</label>
+            <select id="new-flavor-cat" style="margin-bottom:5px;">
+                <option value="normal">For Normal Cake</option>
+                <option value="cool">For Cool Cake</option>
+                <option value="fondant">For Fondant Cake</option>
+            </select>
+            <div class="form-row">
+                <input type="text" id="new-flavor-name" placeholder="Flavor Name" style="width:55%;">
+                <input type="number" id="new-flavor-price" placeholder="₹/Kg" style="width:30%;">
+                <button onclick="addFlavor()" style="background:#28a745; color:white; border:none; padding:10px; border-radius:5px;">Add</button>
+            </div>
+        </div>
+        <button class="primary-btn" onclick="saveAdminPrices()">Save System Prices</button>
+    </div>
+
+
+    <!-- HIDDEN THERMAL PRINT TEMPLATES -->
+    <div id="print-customer-receipt">
+        <div class="print-header">
+            <h1>HINDUSTAN BAKERY</h1>
+            <p>Since 1963 - Kavali<br>Ph: 9494428181</p>
+        </div>
+        <div class="print-row"><span>Order No:</span> <span class="print-bold" id="rcpt-order"></span></div>
+        <div class="print-row"><span>Date:</span> <span id="rcpt-date"></span></div>
+        <div class="print-row"><span>Customer:</span> <span id="rcpt-name"></span></div>
+        <div class="print-row"><span>Phone:</span> <span id="rcpt-phone"></span></div>
+        <div class="print-divider"></div>
+        <div class="print-row"><span>Delivery Date:</span> <span id="rcpt-del-date"></span></div>
+        <div class="print-row"><span>Delivery Time:</span> <span id="rcpt-del-time"></span></div>
+        <div class="print-divider"></div>
+        <div><span class="print-bold" id="rcpt-specs"></span></div>
+        <div class="print-divider"></div>
+        <div class="print-row print-bold" style="font-size:18px;"><span>GRAND TOTAL:</span> <span id="rcpt-total"></span></div>
+        <div class="print-row"><span>Advance Paid:</span> <span id="rcpt-adv"></span></div>
+        <div class="print-row print-bold"><span>BALANCE DUE:</span> <span id="rcpt-bal"></span></div>
+        <div class="print-divider"></div>
+        <p style="text-align:center; font-size:12px;">Changes require 72hrs notice.<br>Advances are non-refundable.</p>
+    </div>
+
+    <div id="print-kot-receipt">
+        <div class="print-header"><h1>KOT - KITCHEN</h1></div>
+        <div class="print-row"><span class="print-bold" style="font-size:18px;">Order No:</span> <span class="print-bold" style="font-size:18px;" id="kot-order"></span></div>
+        <div class="print-row"><span>Ordered On:</span> <span id="kot-date"></span></div>
+        <div class="print-divider"></div>
+        <div class="print-row print-bold"><span>DELIVER ON:</span> <span id="kot-del"></span></div>
+        <div class="print-divider"></div>
+        <div class="print-row"><span>Name:</span> <span class="print-bold" id="kot-name"></span></div>
+        <div class="print-row"><span>Phone:</span> <span id="kot-phone"></span></div>
+        <div class="print-divider"></div>
+        <div><span class="print-bold" style="font-size:16px;">SPECS:</span><br><span id="kot-specs"></span></div>
+        <div style="margin-top:5px;"><span>Extras: 2D(<span id="kot-2d"></span>) | 3D(<span id="kot-3d"></span>) | Addon(<span id="kot-add"></span>)</span></div>
+        <div class="print-divider"></div>
+        <div class="print-bold">NOTES / MSG:</div>
+        <div id="kot-notes" style="padding:5px; border:1px solid #000; margin-top:5px; min-height:40px;"></div>
+        <div class="print-divider"></div>
+        <div class="print-bold">SKETCH:</div>
+        <img id="kot-sketch-img" class="print-img" src="" alt="No sketch">
+        <div id="kot-images-container"></div>
+    </div>
+
+
+    <!-- APPLICATION LOGIC -->
     <script>
-        // Data Structure: Separated Matrices
+        // Data Structure
         const defaultData = {
-            flavors: { 
-                "normal": { "Vanilla": 700, "Strawberry": 750, "Pineapple": 750 },
-                "cool": { "Vanilla": 850, "Chocolate": 1000, "Red Velvet": 1200, "Blueberry": 1100 },
-                "fondant": { "Chocolate": 1200, "Choco Chip": 1400, "Rasmalai": 1500 }
-            },
-            fees: { eggless: 100, art2D: 150, art3D: 450, add50: 50, add200: 200 }
+            egglessExtra: 100,
+            fees: { art2D: 150, art3D: 450, add200: 200 },
+            flavors: {
+                normal: { "Vanilla": 700, "Strawberry": 750, "Pineapple": 800 },
+                cool: { "Vanilla": 800, "Strawberry": 850, "Blackforest": 900, "Red Velvet": 1200 },
+                fondant: { "Vanilla": 1000, "Chocolate": 1200, "Red Velvet": 1500 }
+            }
         };
 
-        let activeData = JSON.parse(localStorage.getItem('hindustanV5')) || defaultData;
-        let grandTotal = 0;
+        let activeData = JSON.parse(localStorage.getItem('hindustanV6')) || defaultData;
+        let uploadedImages = []; // Stores images for KOT print
 
+        // Canvas Setup (Touch & Mouse Support)
+        const canvas = document.getElementById('sketchpad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width - 24; // padding adj
+            canvas.height = 250;
+            ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.strokeStyle = "black";
+        }
+        window.onload = resizeCanvas;
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+        
+        const startDraw = (e) => { e.preventDefault(); isDrawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
+        const draw = (e) => { if(!isDrawing) return; e.preventDefault(); const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); };
+        const stopDraw = (e) => { e.preventDefault(); isDrawing = false; };
+        
+        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw); canvas.addEventListener('mouseout', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive:false}); canvas.addEventListener('touchmove', draw, {passive:false});
+        canvas.addEventListener('touchend', stopDraw);
+
+        function clearCanvas() {
+            ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // App Logic
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
-            
-            if(tabName === 'admin') loadAdminFields();
+            if(tabName === 'order' || tabName === 'admin') resizeCanvas(); // fix canvas size glitch
         }
 
         function adj(id, amount) {
             let el = document.getElementById(id);
             let val = parseFloat(el.value) || 0;
-            val += amount;
-            if(val < (el.min || 0)) val = el.min || 0;
+            val = Math.max((el.min || 0), val + amount);
             el.value = val;
             runQuote();
         }
 
-        // Dependent Flavor Dropdown Logic
-        function populateFlavorDropdown() {
-            let style = document.getElementById('calc-style').value;
+        function updateFlavorList() {
+            let styleKey = document.getElementById('calc-style').value;
             let dropdown = document.getElementById('calc-flavor');
-            let currentSelection = dropdown.value;
             dropdown.innerHTML = '';
-            
-            if (activeData.flavors[style]) {
-                for (let flavorName in activeData.flavors[style]) {
-                    let opt = document.createElement('option');
-                    opt.value = flavorName;
-                    opt.innerText = flavorName + " (₹" + activeData.flavors[style][flavorName] + ")";
-                    dropdown.appendChild(opt);
-                }
-            }
-            if (activeData.flavors[style][currentSelection]) dropdown.value = currentSelection;
-        }
-
-        // Admin Loading & Saving
-        function loadAdminFields() {
-            document.getElementById('set-eggless').value = activeData.fees.eggless;
-            document.getElementById('set-art2D').value = activeData.fees.art2D;
-            document.getElementById('set-art3D').value = activeData.fees.art3D;
-            document.getElementById('set-add50').value = activeData.fees.add50;
-            document.getElementById('set-add200').value = activeData.fees.add200;
-
-            ['normal', 'cool', 'fondant'].forEach(style => {
-                let list = document.getElementById('list-' + style);
-                list.innerHTML = '';
-                for (let flavorName in activeData.flavors[style]) {
-                    list.innerHTML += `
-                    <div class="form-group" style="padding:10px;">
-                        <span style="font-weight:bold; width:45%;">${flavorName}</span>
-                        <input type="number" id="edit-${style}-${flavorName}" value="${activeData.flavors[style][flavorName]}" style="width:30%;">
-                        <button class="delete-btn" onclick="deleteFlavor('${style}', '${flavorName}')">X</button>
-                    </div>`;
-                }
-            });
-        }
-
-        function addFlavor(style) {
-            let name = document.getElementById('new-name-' + style).value.trim();
-            let price = parseInt(document.getElementById('new-price-' + style).value) || 0;
-            if(name !== "") {
-                activeData.flavors[style][name] = price;
-                document.getElementById('new-name-' + style).value = "";
-                document.getElementById('new-price-' + style).value = "";
-                loadAdminFields();
-                populateFlavorDropdown();
+            for (let f in activeData.flavors[styleKey]) {
+                let opt = document.createElement('option'); opt.value = f; opt.innerText = f; dropdown.appendChild(opt);
             }
         }
 
-        function deleteFlavor(style, name) {
-            if(confirm("Remove " + name + " from " + style + "?")) {
-                delete activeData.flavors[style][name];
-                loadAdminFields();
-                populateFlavorDropdown();
-            }
-        }
-
-        function saveAdminPrices() {
-            activeData.fees.eggless = parseInt(document.getElementById('set-eggless').value) || 0;
-            activeData.fees.art2D = parseInt(document.getElementById('set-art2D').value) || 0;
-            activeData.fees.art3D = parseInt(document.getElementById('set-art3D').value) || 0;
-            activeData.fees.add50 = parseInt(document.getElementById('set-add50').value) || 0;
-            activeData.fees.add200 = parseInt(document.getElementById('set-add200').value) || 0;
-
-            ['normal', 'cool', 'fondant'].forEach(style => {
-                for (let flavorName in activeData.flavors[style]) {
-                    let input = document.getElementById(`edit-${style}-${flavorName}`);
-                    if(input) activeData.flavors[style][flavorName] = parseInt(input.value) || 0;
-                }
-            });
-
-            localStorage.setItem('hindustanV5', JSON.stringify(activeData));
-            alert("Prices Updated!");
-            populateFlavorDropdown();
-            runQuote();
-        }
-
-        // Calculation Engine
         function runQuote() {
             let kg = parseFloat(document.getElementById('calc-weight').value) || 0;
-            let style = document.getElementById('calc-style').value;
-            let flavor = document.getElementById('calc-flavor').value;
+            let styleKey = document.getElementById('calc-style').value;
+            let flavorKey = document.getElementById('calc-flavor').value;
             let isEggless = document.getElementById('calc-sponge').value === 'eggless';
+            
+            let flavorRate = activeData.flavors[styleKey][flavorKey] || 0;
+            if(isEggless) flavorRate += parseInt(activeData.egglessExtra);
+            
+            let baseTotal = kg * flavorRate;
+            let designTotal = (parseInt(document.getElementById('calc-2d').value) * activeData.fees.art2D) + 
+                              (parseInt(document.getElementById('calc-3d').value) * activeData.fees.art3D) + 
+                              (parseInt(document.getElementById('calc-add200').value) * activeData.fees.add200);
 
-            let baseFlavorRate = activeData.flavors[style][flavor] || 0;
-            let egglessCharge = isEggless ? (kg * activeData.fees.eggless) : 0;
-            let baseTotal = (kg * baseFlavorRate) + egglessCharge;
-
-            let q2D = parseInt(document.getElementById('calc-2d').value) || 0;
-            let q3D = parseInt(document.getElementById('calc-3d').value) || 0;
-            let qAdd50 = parseInt(document.getElementById('calc-add50').value) || 0;
-            let qAdd200 = parseInt(document.getElementById('calc-add200').value) || 0;
-            let extra = parseInt(document.getElementById('calc-extra').value) || 0;
-
-            let designTotal = (q2D * activeData.fees.art2D) + (q3D * activeData.fees.art3D) + 
-                              (qAdd50 * activeData.fees.add50) + (qAdd200 * activeData.fees.add200) + extra;
-
-            grandTotal = baseTotal + designTotal;
-            document.getElementById('ui-grand-total').innerText = '₹' + grandTotal;
-
-            // Auto-suggest 50% advance if field is empty or unchanged from previous 50%
-            let advField = document.getElementById('calc-advance');
-            if (advField.value === "" || advField.dataset.autoset === "true") {
-                advField.value = grandTotal / 2;
-                advField.dataset.autoset = "true";
-            }
-            calculateBalance();
+            let total = baseTotal + designTotal;
+            document.getElementById('out-total').value = total;
+            
+            // Auto suggest 50% only if advance is 0 to avoid overwriting typed amounts
+            let advInput = document.getElementById('calc-advance');
+            if(parseFloat(advInput.value) === 0 && total > 0) advInput.value = total / 2;
+            
+            calcBalance();
         }
 
-        function calculateBalance() {
-            let advField = document.getElementById('calc-advance');
-            let adv = parseFloat(advField.value) || 0;
-            advField.dataset.autoset = "false"; // User manually edited
-            document.getElementById('ui-balance-due').innerText = '₹' + (grandTotal - adv);
+        function calcBalance() {
+            let total = parseFloat(document.getElementById('out-total').value) || 0;
+            let adv = parseFloat(document.getElementById('calc-advance').value) || 0;
+            document.getElementById('out-balance').value = Math.max(0, total - adv);
+        }
+
+        function addFlavor() {
+            let cat = document.getElementById('new-flavor-cat').value;
+            let name = document.getElementById('new-flavor-name').value.trim();
+            let price = parseInt(document.getElementById('new-flavor-price').value) || 0;
+            if(name !== "") {
+                activeData.flavors[cat][name] = price;
+                document.getElementById('new-flavor-name').value = ""; document.getElementById('new-flavor-price').value = "";
+                updateFlavorList(); runQuote(); alert(name + " added to " + cat + " cakes.");
+            }
+        }
+        function saveAdminPrices() {
+            activeData.egglessExtra = parseInt(document.getElementById('set-eggless').value) || 100;
+            localStorage.setItem('hindustanV6', JSON.stringify(activeData)); alert("Admin Settings Saved.");
         }
 
         // Image Handling
-        function previewImg(input, imgId) {
-            let display = document.getElementById(imgId);
-            if (input.files && input.files[0]) {
-                display.src = URL.createObjectURL(input.files[0]);
-                display.style.display = 'block';
+        function handleImageUpload(e) {
+            let files = e.target.files;
+            let container = document.getElementById('img-preview-container');
+            container.innerHTML = ''; uploadedImages = [];
+            for(let i=0; i<Math.min(files.length, 3); i++) {
+                let url = URL.createObjectURL(files[i]);
+                uploadedImages.push(url);
+                let img = document.createElement('img'); img.src = url; container.appendChild(img);
             }
         }
 
-        // Canvas Sketchpad Logic
-        const canvas = document.getElementById('sketchpad');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = 250;
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        window.onload = () => { populateFlavorDropdown(); runQuote(); resizeCanvas(); };
-
-        function getPos(e) {
-            let rect = canvas.getBoundingClientRect();
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
-        }
-
-        function startDraw(e) { e.preventDefault(); drawing = true; let pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
-        function draw(e) { if(!drawing) return; e.preventDefault(); let pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
-        function stopDraw() { drawing = false; ctx.closePath(); }
-
-        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDraw);
-        canvas.addEventListener('touchstart', startDraw); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stopDraw);
-
-        function clearCanvas() { ctx.fillRect(0, 0, canvas.width, canvas.height); }
-
-        // PRINT ENGINE
-        function gatherData() {
+        // The Print Engine
+        function printAction(type) {
+            // Gather Variables
+            let now = new Date().toLocaleString();
+            let orderNo = document.getElementById('calc-order').value || "WALK-IN";
+            let cName = document.getElementById('calc-name').value || "No Name";
+            let cPhone = document.getElementById('calc-phone').value || "No Number";
+            let cDelDate = document.getElementById('calc-del-date').value || "TBD";
+            let cDelTime = document.getElementById('calc-del-time').value || "TBD";
+            
             let kg = document.getElementById('calc-weight').value;
-            let styleText = document.getElementById('calc-style').options[document.getElementById('calc-style').selectedIndex].text;
             let flavor = document.getElementById('calc-flavor').value;
+            let style = document.getElementById('calc-style').options[document.getElementById('calc-style').selectedIndex].text;
             let sponge = document.getElementById('calc-sponge').options[document.getElementById('calc-sponge').selectedIndex].text;
+            let specsText = `${kg}kg ${flavor} (${style} - ${sponge})`;
+
+            if (type === 'customer') {
+                // Populate Customer Receipt
+                document.getElementById('rcpt-order').innerText = orderNo;
+                document.getElementById('rcpt-date').innerText = now;
+                document.getElementById('rcpt-name').innerText = cName;
+                document.getElementById('rcpt-phone').innerText = cPhone;
+                document.getElementById('rcpt-del-date').innerText = cDelDate;
+                document.getElementById('rcpt-del-time').innerText = cDelTime;
+                document.getElementById('rcpt-specs').innerText = specsText;
+                
+                document.getElementById('rcpt-total').innerText = "₹" + document.getElementById('out-total').value;
+                document.getElementById('rcpt-adv').innerText = "₹" + document.getElementById('calc-advance').value;
+                document.getElementById('rcpt-bal').innerText = "₹" + document.getElementById('out-balance').value;
+                
+                document.body.className = "print-customer"; // triggers CSS
+            } else if (type === 'kot') {
+                // Populate Kitchen Receipt
+                document.getElementById('kot-order').innerText = orderNo;
+                document.getElementById('kot-date').innerText = now;
+                document.getElementById('kot-del').innerText = `${cDelDate} @ ${cDelTime}`;
+                document.getElementById('kot-name').innerText = cName;
+                document.getElementById('kot-phone').innerText = cPhone;
+                document.getElementById('kot-specs').innerText = specsText;
+                
+                document.getElementById('kot-2d').innerText = document.getElementById('calc-2d').value;
+                document.getElementById('kot-3d').innerText = document.getElementById('calc-3d').value;
+                document.getElementById('kot-add').innerText = document.getElementById('calc-add200').value;
+                
+                document.getElementById('kot-notes').innerText = document.getElementById('calc-notes').value;
+                
+                // Convert Sketch to printable image
+                document.getElementById('kot-sketch-img').src = canvas.toDataURL();
+                
+                // Add Uploaded images
+                let kotImgContainer = document.getElementById('kot-images-container');
+                kotImgContainer.innerHTML = '';
+                uploadedImages.forEach(url => {
+                    let img = document.createElement('img'); img.src = url; img.className = 'print-img';
+                    kotImgContainer.appendChild(img);
+                });
+
+                document.body.className = "print-kot"; // triggers CSS
+            }
             
-            return {
-                name: document.getElementById('calc-name').value || "Walk-in",
-                phone: document.getElementById('calc-phone').value || "N/A",
-                order: document.getElementById('calc-order').value || "Pending",
-                specs: `${kg}kg ${flavor} (${styleText} - ${sponge})`,
-                baseTotal: grandTotal - (parseInt(document.getElementById('calc-2d').value)*activeData.fees.art2D + parseInt(document.getElementById('calc-3d').value)*activeData.fees.art3D + parseInt(document.getElementById('calc-add50').value)*activeData.fees.add50 + parseInt(document.getElementById('calc-add200').value)*activeData.fees.add200 + parseInt(document.getElementById('calc-extra').value)),
-                designTotal: grandTotal - (grandTotal - (parseInt(document.getElementById('calc-2d').value)*activeData.fees.art2D + parseInt(document.getElementById('calc-3d').value)*activeData.fees.art3D + parseInt(document.getElementById('calc-add50').value)*activeData.fees.add50 + parseInt(document.getElementById('calc-add200').value)*activeData.fees.add200 + parseInt(document.getElementById('calc-extra').value))),
-                items: `2D: ${document.getElementById('calc-2d').value} | 3D: ${document.getElementById('calc-3d').value} | Add-ons: ${parseInt(document.getElementById('calc-add50').value) + parseInt(document.getElementById('calc-add200').value)}`,
-                adv: document.getElementById('calc-advance').value,
-                bal: document.getElementById('ui-balance-due').innerText,
-                notes: document.getElementById('calc-notes').value || "No special instructions."
-            };
-        }
-
-        function printReceipt() {
-            let data = gatherData();
-            document.getElementById('prnt-order').innerText = data.order;
-            document.getElementById('prnt-name').innerText = data.name;
-            document.getElementById('prnt-phone').innerText = data.phone;
-            document.getElementById('prnt-specs').innerText = data.specs;
-            document.getElementById('prnt-base').innerText = '₹' + data.baseTotal;
-            document.getElementById('prnt-design').innerText = '₹' + data.designTotal;
-            document.getElementById('prnt-total').innerText = '₹' + grandTotal;
-            document.getElementById('prnt-adv').innerText = '₹' + data.adv;
-            document.getElementById('prnt-bal').innerText = data.bal;
-
-            document.body.className = 'print-receipt';
             window.print();
-            document.body.className = '';
-        }
-
-        function printKOT() {
-            let data = gatherData();
-            document.getElementById('kot-order').innerText = data.order;
-            document.getElementById('kot-name').innerText = data.name;
-            document.getElementById('kot-specs-details').innerText = data.specs;
-            document.getElementById('kot-items').innerText = data.items;
-            document.getElementById('kot-notes-display').innerText = data.notes;
             
-            // Move canvas to image for printing
-            document.getElementById('kot-canvas-img').src = canvas.toDataURL('image/png');
-
-            document.body.className = 'print-kot';
-            window.print();
-            document.body.className = '';
+            // Revert back to screen mode after printing
+            setTimeout(() => { document.body.className = ""; }, 500); 
         }
+
+        function resetForm() {
+            if(confirm("Clear all fields and start a new order?")) {
+                document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea').forEach(i => i.value = '');
+                document.getElementById('calc-weight').value = 1; document.getElementById('calc-advance').value = 0;
+                document.getElementById('img-preview-container').innerHTML = ''; uploadedImages = [];
+                clearCanvas(); updateFlavorList(); runQuote(); switchTab('order');
+            }
+        }
+
+        // Initial Load
+        updateFlavorList(); runQuote(); document.getElementById('set-eggless').value = activeData.egglessExtra;
     </script>
 </body>
 </html>
