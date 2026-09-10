@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hindustan Bakery KOT System</title>
+    <title>Hindustan Bakery KOT System V7</title>
     <style>
         :root {
             --brand-maroon: #731213;
@@ -41,26 +41,30 @@
         button.primary-btn { background: var(--brand-maroon); color: var(--brand-gold); border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; flex: 1; cursor: pointer; }
         button.customer-btn { background: #28a745; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; flex: 1; cursor: pointer; }
         button.reset-btn { background: #dc3545; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; width: 100%; margin-top: 15px; cursor: pointer; }
-        
-        /* Sketchpad */
-        canvas { border: 2px dashed #999; background: #fff; width: 100%; height: 250px; touch-action: none; border-radius: 8px; }
-        .preview-imgs { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .preview-imgs img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
+        button.action-btn { background: #666; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
 
-        /* Print Output Elements - Hidden during normal app use */
+        /* Sketchpad & Images */
+        canvas { background: #fff; width: 100%; height: auto; touch-action: none; border-radius: 8px; border: 2px dashed #999; }
+        .preview-imgs { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .preview-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
+
+        /* Admin List Styles */
+        .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
+        .admin-list-item input { width: 80px; padding: 5px; text-align: center; }
+        .admin-del-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; }
+
+        /* Hidden Print Elements */
         #print-customer-receipt, #print-kot-receipt { display: none; }
 
-        /* PRINT MEDIA QUERIES - FORCES 80mm THERMAL WIDTH */
+        /* PRINT MEDIA QUERIES - 80mm THERMAL */
         @media print {
             body * { visibility: hidden; }
             body { background: white; padding: 0; margin: 0; }
             
-            /* Only show the selected receipt based on the body class */
             body.print-customer #print-customer-receipt, body.print-customer #print-customer-receipt * { visibility: visible; display: block; }
             body.print-kot #print-kot-receipt, body.print-kot #print-kot-receipt * { visibility: visible; display: block; }
             
-            /* Formatting for thermal roll */
-            #print-customer-receipt, #print-kot-receipt { position: absolute; left: 0; top: 0; width: 80mm; max-width: 80mm; font-family: monospace; font-size: 14px; color: black; background: white; padding: 5px; }
+            #print-customer-receipt, #print-kot-receipt { position: absolute; left: 0; top: 0; width: 80mm; max-width: 80mm; font-family: monospace; font-size: 14px; color: black; background: white; padding: 5px; box-sizing: border-box; }
             
             .print-header { text-align: center; font-weight: bold; border-bottom: 2px dashed black; padding-bottom: 10px; margin-bottom: 10px; }
             .print-header h1 { margin: 0; font-size: 20px; }
@@ -86,7 +90,7 @@
         <div class="form-group">
             <label>Customer Details</label>
             <input type="text" id="calc-name" placeholder="Name" style="margin-bottom:8px;">
-            <input type="text" id="calc-phone" placeholder="Phone Number">
+            <input type="number" id="calc-phone" placeholder="Phone Number">
         </div>
         
         <div class="form-group">
@@ -120,32 +124,33 @@
         </div>
 
         <div class="form-group">
-            <div class="form-row">
-                <label>Weight (kg)</label>
-                <div class="qty-wrapper">
-                    <button class="qty-btn" onclick="adj('calc-weight', -0.5)">-</button>
-                    <input type="number" id="calc-weight" value="1" step="0.5" min="0.5" onchange="runQuote()">
-                    <button class="qty-btn" onclick="adj('calc-weight', 0.5)">+</button>
-                </div>
+            <div class="form-row"><label>Weight (kg)</label>
+                <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-weight', -0.5)">-</button><input type="number" id="calc-weight" value="1" step="0.5" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-weight', 0.5)">+</button></div>
             </div>
         </div>
-        
         <div class="form-group">
-            <div class="form-row">
-                <label>2D Fondant Details</label>
+            <div class="form-row"><label>2D Fondant Details</label>
                 <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-2d', -1)">-</button><input type="number" id="calc-2d" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-2d', 1)">+</button></div>
             </div>
         </div>
         <div class="form-group">
-            <div class="form-row">
-                <label>3D Sculptures</label>
+            <div class="form-row"><label>3D Sculptures</label>
                 <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-3d', -1)">-</button><input type="number" id="calc-3d" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-3d', 1)">+</button></div>
             </div>
         </div>
         <div class="form-group">
-            <div class="form-row">
-                <label>Premium Add-ons</label>
+            <div class="form-row"><label>Basic Add-ons</label>
+                <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-add50', -1)">-</button><input type="number" id="calc-add50" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-add50', 1)">+</button></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-row"><label>Premium Add-ons</label>
                 <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-add200', -1)">-</button><input type="number" id="calc-add200" value="0" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-add200', 1)">+</button></div>
+            </div>
+        </div>
+        <div class="form-group" style="border-left-color: #333;">
+            <div class="form-row"><label>Extra Charges (₹)</label>
+                <div class="qty-wrapper"><button class="qty-btn" onclick="adj('calc-extra', -50)">-</button><input type="number" id="calc-extra" value="0" step="50" onchange="runQuote()"><button class="qty-btn" onclick="adj('calc-extra', 50)">+</button></div>
             </div>
         </div>
 
@@ -167,47 +172,59 @@
     <div id="visuals" class="container">
         <div class="form-group">
             <label>Kitchen Notes / Message on Cake</label>
-            <textarea id="calc-notes" rows="3" placeholder="Write any specific design notes or messages here..."></textarea>
+            <textarea id="calc-notes" rows="3" placeholder="Write specific design notes or messages here..."></textarea>
         </div>
         
         <div class="form-group">
-            <label>Reference Images (Upload max 3)</label>
-            <input type="file" id="calc-images" accept="image/*" multiple onchange="handleImageUpload(event)">
+            <label>Reference Images (Max 3)</label>
+            <input type="file" id="calc-images" accept="image/*" onchange="handleImageUpload(event)">
             <div class="preview-imgs" id="img-preview-container"></div>
+            <button class="action-btn" onclick="clearImages()" style="margin-top:10px; width:120px;">Clear Images</button>
         </div>
 
         <div class="form-group">
             <label>Draw Custom Sketch</label>
-            <canvas id="sketchpad"></canvas>
-            <button onclick="clearCanvas()" style="margin-top:10px; padding:10px; background:#666; color:white; border:none; border-radius:5px;">Clear Drawing</button>
+            <!-- Fixed internal resolution prevents canvas from erasing on tab switch -->
+            <canvas id="sketchpad" width="600" height="400"></canvas>
+            <button class="action-btn" onclick="clearCanvas()" style="margin-top:10px; width:120px;">Clear Drawing</button>
         </div>
     </div>
 
     <!-- ADMIN TAB -->
     <div id="admin" class="container">
-        <div class="form-group">
-            <label>Eggless Sponge Extra (₹ per Kg)</label>
-            <input type="number" id="set-eggless" value="100">
-        </div>
+        <div class="form-group"><label>Eggless Sponge Extra (₹/Kg)</label><input type="number" id="set-eggless" value="100"></div>
         
+        <h2 class="section-title">Design & Add-on Prices (₹)</h2>
         <div class="form-group">
+            <div class="form-row"><label>2D Detail Rate</label><input type="number" id="set-art2D" style="width:100px;"></div>
+            <div class="form-row" style="margin-top:5px;"><label>3D Sculpture Rate</label><input type="number" id="set-art3D" style="width:100px;"></div>
+            <div class="form-row" style="margin-top:5px;"><label>Basic Add-on Rate</label><input type="number" id="set-add50" style="width:100px;"></div>
+            <div class="form-row" style="margin-top:5px;"><label>Premium Add-on Rate</label><input type="number" id="set-add200" style="width:100px;"></div>
+        </div>
+
+        <h2 class="section-title">Manage Flavors</h2>
+        <div class="form-group" style="background:#e0d0c0;">
             <label>Add New Flavor</label>
             <select id="new-flavor-cat" style="margin-bottom:5px;">
-                <option value="normal">For Normal Cake</option>
-                <option value="cool">For Cool Cake</option>
-                <option value="fondant">For Fondant Cake</option>
+                <option value="normal">Normal Cake</option>
+                <option value="cool">Cool Cake</option>
+                <option value="fondant">Fondant Cake</option>
             </select>
             <div class="form-row">
-                <input type="text" id="new-flavor-name" placeholder="Flavor Name" style="width:55%;">
+                <input type="text" id="new-flavor-name" placeholder="Name" style="width:55%;">
                 <input type="number" id="new-flavor-price" placeholder="₹/Kg" style="width:30%;">
-                <button onclick="addFlavor()" style="background:#28a745; color:white; border:none; padding:10px; border-radius:5px;">Add</button>
+                <button onclick="addFlavor()" style="background:#28a745; color:white; border:none; border-radius:5px;">Add</button>
             </div>
         </div>
-        <button class="primary-btn" onclick="saveAdminPrices()">Save System Prices</button>
+        
+        <div class="form-group" id="admin-flavor-list">
+            <!-- Populated via JS -->
+        </div>
+
+        <button class="primary-btn" onclick="saveAdminPrices()" style="margin-bottom:40px;">Save System Prices</button>
     </div>
 
-
-    <!-- HIDDEN THERMAL PRINT TEMPLATES -->
+    <!-- HIDDEN THERMAL TEMPLATES -->
     <div id="print-customer-receipt">
         <div class="print-header">
             <h1>HINDUSTAN BAKERY</h1>
@@ -241,23 +258,23 @@
         <div class="print-row"><span>Phone:</span> <span id="kot-phone"></span></div>
         <div class="print-divider"></div>
         <div><span class="print-bold" style="font-size:16px;">SPECS:</span><br><span id="kot-specs"></span></div>
-        <div style="margin-top:5px;"><span>Extras: 2D(<span id="kot-2d"></span>) | 3D(<span id="kot-3d"></span>) | Addon(<span id="kot-add"></span>)</span></div>
+        <div style="margin-top:5px;"><span>Extras: 2D(<span id="kot-2d"></span>) | 3D(<span id="kot-3d"></span>) | B.Add(<span id="kot-add50"></span>) | P.Add(<span id="kot-add200"></span>)</span></div>
         <div class="print-divider"></div>
         <div class="print-bold">NOTES / MSG:</div>
         <div id="kot-notes" style="padding:5px; border:1px solid #000; margin-top:5px; min-height:40px;"></div>
         <div class="print-divider"></div>
         <div class="print-bold">SKETCH:</div>
-        <img id="kot-sketch-img" class="print-img" src="" alt="No sketch">
+        <!-- This is where the script injects the drawing just before printing -->
+        <img id="kot-sketch-img" class="print-img" src="" alt="Sketch area">
         <div id="kot-images-container"></div>
     </div>
 
 
-    <!-- APPLICATION LOGIC -->
     <script>
-        // Data Structure
+        // CORE DATA
         const defaultData = {
             egglessExtra: 100,
-            fees: { art2D: 150, art3D: 450, add200: 200 },
+            fees: { art2D: 150, art3D: 450, add50: 50, add200: 200 },
             flavors: {
                 normal: { "Vanilla": 700, "Strawberry": 750, "Pineapple": 800 },
                 cool: { "Vanilla": 800, "Strawberry": 850, "Blackforest": 900, "Red Velvet": 1200 },
@@ -265,28 +282,28 @@
             }
         };
 
-        let activeData = JSON.parse(localStorage.getItem('hindustanV6')) || defaultData;
-        let uploadedImages = []; // Stores images for KOT print
+        let activeData = JSON.parse(localStorage.getItem('hindustanV7')) || defaultData;
+        let uploadedImages = [];
 
-        // Canvas Setup (Touch & Mouse Support)
+        // CANVAS LOGIC (Touch & Mouse)
         const canvas = document.getElementById('sketchpad');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
         
-        function resizeCanvas() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width - 24; // padding adj
-            canvas.height = 250;
-            ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.strokeStyle = "black";
+        function initCanvas() {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = "black";
         }
-        window.onload = resizeCanvas;
+        window.onload = initCanvas;
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
             let clientX = e.clientX || (e.touches && e.touches[0].clientX);
             let clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
         }
         
         const startDraw = (e) => { e.preventDefault(); isDrawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
@@ -298,34 +315,31 @@
         canvas.addEventListener('touchstart', startDraw, {passive:false}); canvas.addEventListener('touchmove', draw, {passive:false});
         canvas.addEventListener('touchend', stopDraw);
 
-        function clearCanvas() {
-            ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+        function clearCanvas() { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
 
-        // App Logic
+        // APP LOGIC
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-            if(tabName === 'order' || tabName === 'admin') resizeCanvas(); // fix canvas size glitch
+            event.target.classList.add('active'); document.getElementById(tabName).classList.add('active');
+            if(tabName === 'admin') loadAdminFields();
         }
 
         function adj(id, amount) {
             let el = document.getElementById(id);
             let val = parseFloat(el.value) || 0;
             val = Math.max((el.min || 0), val + amount);
-            el.value = val;
-            runQuote();
+            el.value = val; runQuote();
         }
 
         function updateFlavorList() {
             let styleKey = document.getElementById('calc-style').value;
             let dropdown = document.getElementById('calc-flavor');
-            dropdown.innerHTML = '';
+            let current = dropdown.value; dropdown.innerHTML = '';
             for (let f in activeData.flavors[styleKey]) {
                 let opt = document.createElement('option'); opt.value = f; opt.innerText = f; dropdown.appendChild(opt);
             }
+            if(activeData.flavors[styleKey][current]) dropdown.value = current;
         }
 
         function runQuote() {
@@ -340,15 +354,15 @@
             let baseTotal = kg * flavorRate;
             let designTotal = (parseInt(document.getElementById('calc-2d').value) * activeData.fees.art2D) + 
                               (parseInt(document.getElementById('calc-3d').value) * activeData.fees.art3D) + 
-                              (parseInt(document.getElementById('calc-add200').value) * activeData.fees.add200);
+                              (parseInt(document.getElementById('calc-add50').value) * activeData.fees.add50) + 
+                              (parseInt(document.getElementById('calc-add200').value) * activeData.fees.add200) +
+                              (parseInt(document.getElementById('calc-extra').value) || 0);
 
             let total = baseTotal + designTotal;
             document.getElementById('out-total').value = total;
             
-            // Auto suggest 50% only if advance is 0 to avoid overwriting typed amounts
             let advInput = document.getElementById('calc-advance');
             if(parseFloat(advInput.value) === 0 && total > 0) advInput.value = total / 2;
-            
             calcBalance();
         }
 
@@ -358,6 +372,30 @@
             document.getElementById('out-balance').value = Math.max(0, total - adv);
         }
 
+        // ADMIN LOGIC
+        function loadAdminFields() {
+            document.getElementById('set-eggless').value = activeData.egglessExtra;
+            document.getElementById('set-art2D').value = activeData.fees.art2D;
+            document.getElementById('set-art3D').value = activeData.fees.art3D;
+            document.getElementById('set-add50').value = activeData.fees.add50;
+            document.getElementById('set-add200').value = activeData.fees.add200;
+
+            let listDiv = document.getElementById('admin-flavor-list'); listDiv.innerHTML = '';
+            ['normal', 'cool', 'fondant'].forEach(cat => {
+                let catTitle = document.createElement('h3'); 
+                catTitle.innerText = cat.toUpperCase() + " CAKES"; catTitle.style.color = "#731213";
+                listDiv.appendChild(catTitle);
+                
+                for (let f in activeData.flavors[cat]) {
+                    let div = document.createElement('div'); div.className = 'admin-list-item';
+                    div.innerHTML = `<span>${f}</span> 
+                        <div><input type="number" id="edit-${cat}-${f}" value="${activeData.flavors[cat][f]}"> 
+                        <button class="admin-del-btn" onclick="delFlavor('${cat}', '${f}')">X</button></div>`;
+                    listDiv.appendChild(div);
+                }
+            });
+        }
+
         function addFlavor() {
             let cat = document.getElementById('new-flavor-cat').value;
             let name = document.getElementById('new-flavor-name').value.trim();
@@ -365,29 +403,54 @@
             if(name !== "") {
                 activeData.flavors[cat][name] = price;
                 document.getElementById('new-flavor-name').value = ""; document.getElementById('new-flavor-price').value = "";
-                updateFlavorList(); runQuote(); alert(name + " added to " + cat + " cakes.");
+                updateFlavorList(); runQuote(); loadAdminFields();
             }
         }
-        function saveAdminPrices() {
-            activeData.egglessExtra = parseInt(document.getElementById('set-eggless').value) || 100;
-            localStorage.setItem('hindustanV6', JSON.stringify(activeData)); alert("Admin Settings Saved.");
+        
+        function delFlavor(cat, name) {
+            if(confirm("Delete " + name + " from " + cat + "?")) {
+                delete activeData.flavors[cat][name];
+                updateFlavorList(); runQuote(); loadAdminFields();
+            }
         }
 
-        // Image Handling
+        function saveAdminPrices() {
+            activeData.egglessExtra = parseInt(document.getElementById('set-eggless').value) || 100;
+            activeData.fees.art2D = parseInt(document.getElementById('set-art2D').value) || 0;
+            activeData.fees.art3D = parseInt(document.getElementById('set-art3D').value) || 0;
+            activeData.fees.add50 = parseInt(document.getElementById('set-add50').value) || 0;
+            activeData.fees.add200 = parseInt(document.getElementById('set-add200').value) || 0;
+
+            ['normal', 'cool', 'fondant'].forEach(cat => {
+                for (let f in activeData.flavors[cat]) {
+                    let el = document.getElementById(`edit-${cat}-${f}`);
+                    if(el) activeData.flavors[cat][f] = parseInt(el.value) || 0;
+                }
+            });
+            localStorage.setItem('hindustanV7', JSON.stringify(activeData)); 
+            alert("Admin Settings Saved."); updateFlavorList(); runQuote();
+        }
+
+        // IMAGE LOGIC
         function handleImageUpload(e) {
             let files = e.target.files;
             let container = document.getElementById('img-preview-container');
-            container.innerHTML = ''; uploadedImages = [];
-            for(let i=0; i<Math.min(files.length, 3); i++) {
+            for(let i=0; i<files.length; i++) {
+                if(uploadedImages.length >= 3) { alert("Max 3 images allowed."); break; }
                 let url = URL.createObjectURL(files[i]);
                 uploadedImages.push(url);
-                let img = document.createElement('img'); img.src = url; container.appendChild(img);
+                let img = document.createElement('img'); img.src = url; img.className = 'preview-thumb';
+                container.appendChild(img);
             }
+            e.target.value = ""; // Reset file input so same file can be tapped again
+        }
+        
+        function clearImages() {
+            uploadedImages = []; document.getElementById('img-preview-container').innerHTML = '';
         }
 
-        // The Print Engine
+        // PRINT ENGINE
         function printAction(type) {
-            // Gather Variables
             let now = new Date().toLocaleString();
             let orderNo = document.getElementById('calc-order').value || "WALK-IN";
             let cName = document.getElementById('calc-name').value || "No Name";
@@ -402,67 +465,52 @@
             let specsText = `${kg}kg ${flavor} (${style} - ${sponge})`;
 
             if (type === 'customer') {
-                // Populate Customer Receipt
-                document.getElementById('rcpt-order').innerText = orderNo;
-                document.getElementById('rcpt-date').innerText = now;
-                document.getElementById('rcpt-name').innerText = cName;
-                document.getElementById('rcpt-phone').innerText = cPhone;
-                document.getElementById('rcpt-del-date').innerText = cDelDate;
-                document.getElementById('rcpt-del-time').innerText = cDelTime;
+                document.getElementById('rcpt-order').innerText = orderNo; document.getElementById('rcpt-date').innerText = now;
+                document.getElementById('rcpt-name').innerText = cName; document.getElementById('rcpt-phone').innerText = cPhone;
+                document.getElementById('rcpt-del-date').innerText = cDelDate; document.getElementById('rcpt-del-time').innerText = cDelTime;
                 document.getElementById('rcpt-specs').innerText = specsText;
-                
                 document.getElementById('rcpt-total').innerText = "₹" + document.getElementById('out-total').value;
                 document.getElementById('rcpt-adv').innerText = "₹" + document.getElementById('calc-advance').value;
                 document.getElementById('rcpt-bal').innerText = "₹" + document.getElementById('out-balance').value;
                 
-                document.body.className = "print-customer"; // triggers CSS
+                document.body.className = "print-customer"; 
+                window.print();
+                setTimeout(() => { document.body.className = ""; }, 500);
             } else if (type === 'kot') {
-                // Populate Kitchen Receipt
-                document.getElementById('kot-order').innerText = orderNo;
-                document.getElementById('kot-date').innerText = now;
+                document.getElementById('kot-order').innerText = orderNo; document.getElementById('kot-date').innerText = now;
                 document.getElementById('kot-del').innerText = `${cDelDate} @ ${cDelTime}`;
-                document.getElementById('kot-name').innerText = cName;
-                document.getElementById('kot-phone').innerText = cPhone;
+                document.getElementById('kot-name').innerText = cName; document.getElementById('kot-phone').innerText = cPhone;
                 document.getElementById('kot-specs').innerText = specsText;
                 
                 document.getElementById('kot-2d').innerText = document.getElementById('calc-2d').value;
                 document.getElementById('kot-3d').innerText = document.getElementById('calc-3d').value;
-                document.getElementById('kot-add').innerText = document.getElementById('calc-add200').value;
-                
+                document.getElementById('kot-add50').innerText = document.getElementById('calc-add50').value;
+                document.getElementById('kot-add200').innerText = document.getElementById('calc-add200').value;
                 document.getElementById('kot-notes').innerText = document.getElementById('calc-notes').value;
                 
-                // Convert Sketch to printable image
-                document.getElementById('kot-sketch-img').src = canvas.toDataURL();
-                
-                // Add Uploaded images
-                let kotImgContainer = document.getElementById('kot-images-container');
-                kotImgContainer.innerHTML = '';
-                uploadedImages.forEach(url => {
-                    let img = document.createElement('img'); img.src = url; img.className = 'print-img';
-                    kotImgContainer.appendChild(img);
-                });
+                let kotImgContainer = document.getElementById('kot-images-container'); kotImgContainer.innerHTML = '';
+                uploadedImages.forEach(url => { let img = document.createElement('img'); img.src = url; img.className = 'print-img'; kotImgContainer.appendChild(img); });
 
-                document.body.className = "print-kot"; // triggers CSS
+                // Capture Sketch & Delay Print to allow rendering
+                document.getElementById('kot-sketch-img').src = canvas.toDataURL("image/png");
+                document.body.className = "print-kot";
+                
+                setTimeout(() => {
+                    window.print();
+                    setTimeout(() => { document.body.className = ""; }, 500); 
+                }, 300); // 0.3s delay guarantees the sketch appears on the print
             }
-            
-            window.print();
-            
-            // Revert back to screen mode after printing
-            setTimeout(() => { document.body.className = ""; }, 500); 
         }
 
         function resetForm() {
             if(confirm("Clear all fields and start a new order?")) {
                 document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea').forEach(i => i.value = '');
                 document.getElementById('calc-weight').value = 1; document.getElementById('calc-advance').value = 0;
-                document.getElementById('img-preview-container').innerHTML = ''; uploadedImages = [];
-                clearCanvas(); updateFlavorList(); runQuote(); switchTab('order');
+                clearImages(); clearCanvas(); updateFlavorList(); runQuote(); switchTab('order');
             }
         }
 
-        // Initial Load
-        updateFlavorList(); runQuote(); document.getElementById('set-eggless').value = activeData.egglessExtra;
+        updateFlavorList(); runQuote();
     </script>
 </body>
 </html>
-<!-- Retrying the deployment -->
