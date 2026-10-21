@@ -5,7 +5,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hindustan Bakery KOT System V7</title>
+    <!-- The title tag dictates the default PDF save name. It is dynamically updated by JS -->
+    <title id="doc-title">Hindustan Bakery KOT</title>
     <style>
         :root {
             --brand-maroon: #731213;
@@ -16,8 +17,8 @@
         body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
         
         .header { background: var(--brand-maroon); color: var(--brand-gold); padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
-        .tabs { display: flex; background: #e0d0c0; }
-        .tab { flex: 1; text-align: center; padding: 15px; font-size: 16px; font-weight: bold; color: var(--brand-maroon); cursor: pointer; border-bottom: 3px solid transparent; }
+        .tabs { display: flex; background: #e0d0c0; flex-wrap: wrap; }
+        .tab { flex: 1; text-align: center; padding: 12px 5px; font-size: 14px; font-weight: bold; color: var(--brand-maroon); cursor: pointer; border-bottom: 3px solid transparent; min-width: 20%;}
         .tab.active { background: var(--brand-maroon); color: var(--brand-gold); border-bottom: 3px solid var(--brand-gold); }
 
         .container { padding: 15px; max-width: 800px; margin: 0 auto; display: none; }
@@ -48,10 +49,13 @@
         .preview-imgs { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
         .preview-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
 
-        /* Admin List Styles */
+        /* Admin & History List Styles */
         .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
         .admin-list-item input { width: 80px; padding: 5px; text-align: center; }
         .admin-del-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; }
+        
+        .history-card { background: white; padding: 12px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #28a745; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .history-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; }
 
         /* Hidden Print Elements */
         #print-customer-receipt, #print-kot-receipt { display: none; }
@@ -64,14 +68,20 @@
             body.print-customer #print-customer-receipt, body.print-customer #print-customer-receipt * { visibility: visible; display: block; }
             body.print-kot #print-kot-receipt, body.print-kot #print-kot-receipt * { visibility: visible; display: block; }
             
-            #print-customer-receipt, #print-kot-receipt { position: absolute; left: 0; top: 0; width: 80mm; max-width: 80mm; font-family: monospace; font-size: 14px; color: black; background: white; padding: 5px; box-sizing: border-box; }
+            #print-customer-receipt, #print-kot-receipt { position: absolute; left: 0; top: 0; width: 80mm; max-width: 80mm; font-family: monospace; font-size: 13px; color: black; background: white; padding: 3px; box-sizing: border-box; }
             
-            .print-header { text-align: center; font-weight: bold; border-bottom: 2px dashed black; padding-bottom: 10px; margin-bottom: 10px; }
-            .print-header h1 { margin: 0; font-size: 20px; }
-            .print-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-            .print-divider { border-top: 1px dashed black; margin: 10px 0; }
-            .print-bold { font-weight: bold; font-size: 16px; }
-            .print-img { max-width: 100%; height: auto; margin-top: 10px; display: block; border: 1px solid black; }
+            .print-header { text-align: center; font-weight: bold; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
+            .print-header h1 { margin: 0; font-size: 18px; }
+            .print-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+            .print-divider { border-top: 1px dashed black; margin: 8px 0; }
+            .print-bold { font-weight: bold; font-size: 15px; }
+            .print-img { max-width: 100%; height: auto; margin-top: 5px; display: block; border: 1px solid black; }
+            
+            /* Tabular Specs Fix for 80mm */
+            .specs-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+            .specs-table td { padding: 4px 2px; vertical-align: top; border-bottom: 1px dotted #ccc; }
+            .specs-table td:first-child { width: 60%; }
+            .specs-table td:last-child { width: 40%; text-align: right; font-weight: bold; }
         }
     </style>
 </head>
@@ -81,26 +91,27 @@
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab('order')">Order Intake</div>
-        <div class="tab" onclick="switchTab('visuals')">Visuals & Notes</div>
-        <div class="tab" onclick="switchTab('admin')">Admin Menu</div>
+        <div class="tab" onclick="switchTab('visuals')">Visuals/Notes</div>
+        <div class="tab" onclick="switchTab('history')">Order History</div>
+        <div class="tab" onclick="switchTab('admin')">Admin</div>
     </div>
 
     <!-- ORDER INTAKE TAB -->
     <div id="order" class="container active">
         <div class="form-group">
-            <label>Customer Details</label>
-            <input type="text" id="calc-name" placeholder="Name" style="margin-bottom:8px;">
-            <input type="number" id="calc-phone" placeholder="Phone Number">
-        </div>
-        
-        <div class="form-group">
             <div class="form-row">
-                <div style="width:48%;"><label>Order No</label><input type="text" id="calc-order" placeholder="#000"></div>
+                <div style="width:48%;"><label>Order No</label><input type="text" id="calc-order" style="font-weight:bold; color:var(--brand-maroon);" readonly></div>
                 <div style="width:48%;"><label>Delivery Date</label><input type="date" id="calc-del-date"></div>
             </div>
             <div class="form-row" style="margin-top:8px;">
                 <div style="width:100%;"><label>Delivery Time</label><input type="time" id="calc-del-time"></div>
             </div>
+        </div>
+
+        <div class="form-group">
+            <label>Customer Details</label>
+            <input type="text" id="calc-name" placeholder="Name" style="margin-bottom:8px;">
+            <input type="number" id="calc-phone" placeholder="Phone Number">
         </div>
 
         <h2 class="section-title">Cake Specifications</h2>
@@ -157,7 +168,7 @@
         <h2 class="section-title">Billing summary</h2>
         <div class="form-group" style="background: #f8f9fa;">
             <div class="form-row" style="margin-bottom:10px;"><label>Grand Total (₹)</label><input type="number" id="out-total" readonly style="width:50%; font-weight:bold; background:#e9ecef;"></div>
-            <div class="form-row" style="margin-bottom:10px;"><label>Advance Paid (₹)</label><input type="number" id="calc-advance" value="0" onchange="calcBalance()" style="width:50%; border:2px solid #28a745;"></div>
+            <div class="form-row" style="margin-bottom:10px;"><label>Advance Paid (₹)</label><input type="number" id="calc-advance" onchange="manuallySetAdvance()" style="width:50%; border:2px solid #28a745;"></div>
             <div class="form-row"><label>Balance Due (₹)</label><input type="number" id="out-balance" readonly style="width:50%; font-weight:bold; background:#e9ecef;"></div>
         </div>
 
@@ -184,10 +195,18 @@
 
         <div class="form-group">
             <label>Draw Custom Sketch</label>
-            <!-- Fixed internal resolution prevents canvas from erasing on tab switch -->
             <canvas id="sketchpad" width="600" height="400"></canvas>
             <button class="action-btn" onclick="clearCanvas()" style="margin-top:10px; width:120px;">Clear Drawing</button>
         </div>
+    </div>
+
+    <!-- ORDER HISTORY TAB -->
+    <div id="history" class="container">
+        <h2 class="section-title">Saved Orders</h2>
+        <div class="form-group" style="background:transparent; box-shadow:none; padding:0; border:none;">
+            <button class="reset-btn" onclick="clearHistory()" style="margin-top:0; margin-bottom:15px; padding:10px;">Clear All History</button>
+        </div>
+        <div id="history-list"></div>
     </div>
 
     <!-- ADMIN TAB -->
@@ -217,10 +236,7 @@
             </div>
         </div>
         
-        <div class="form-group" id="admin-flavor-list">
-            <!-- Populated via JS -->
-        </div>
-
+        <div class="form-group" id="admin-flavor-list"></div>
         <button class="primary-btn" onclick="saveAdminPrices()" style="margin-bottom:40px;">Save System Prices</button>
     </div>
 
@@ -228,7 +244,7 @@
     <div id="print-customer-receipt">
         <div class="print-header">
             <h1>HINDUSTAN BAKERY</h1>
-            <p>Since 1963 - Kavali<br>Ph: 9494428181</p>
+            <p style="margin:2px 0;">Since 1963 - Kavali<br>Ph: 9494428181</p>
         </div>
         <div class="print-row"><span>Order No:</span> <span class="print-bold" id="rcpt-order"></span></div>
         <div class="print-row"><span>Date:</span> <span id="rcpt-date"></span></div>
@@ -238,18 +254,26 @@
         <div class="print-row"><span>Delivery Date:</span> <span id="rcpt-del-date"></span></div>
         <div class="print-row"><span>Delivery Time:</span> <span id="rcpt-del-time"></span></div>
         <div class="print-divider"></div>
-        <div><span class="print-bold" id="rcpt-specs"></span></div>
+        
+        <!-- Tabular Specs Fix -->
+        <span class="print-bold">CAKE DETAILS:</span>
+        <table class="specs-table">
+            <tr><td id="rcpt-cake-desc"></td><td id="rcpt-cake-weight"></td></tr>
+            <tr><td>Cake Style:</td><td id="rcpt-cake-style"></td></tr>
+            <tr><td>Sponge:</td><td id="rcpt-cake-sponge"></td></tr>
+        </table>
+        
         <div class="print-divider"></div>
-        <div class="print-row print-bold" style="font-size:18px;"><span>GRAND TOTAL:</span> <span id="rcpt-total"></span></div>
+        <div class="print-row print-bold" style="font-size:16px;"><span>GRAND TOTAL:</span> <span id="rcpt-total"></span></div>
         <div class="print-row"><span>Advance Paid:</span> <span id="rcpt-adv"></span></div>
         <div class="print-row print-bold"><span>BALANCE DUE:</span> <span id="rcpt-bal"></span></div>
         <div class="print-divider"></div>
-        <p style="text-align:center; font-size:12px;">Changes require 72hrs notice.<br>Advances are non-refundable.</p>
+        <p style="text-align:center; font-size:11px;">Changes require 72hrs notice.<br>Advances are non-refundable.</p>
     </div>
 
     <div id="print-kot-receipt">
         <div class="print-header"><h1>KOT - KITCHEN</h1></div>
-        <div class="print-row"><span class="print-bold" style="font-size:18px;">Order No:</span> <span class="print-bold" style="font-size:18px;" id="kot-order"></span></div>
+        <div class="print-row"><span class="print-bold" style="font-size:16px;">Order No:</span> <span class="print-bold" style="font-size:16px;" id="kot-order"></span></div>
         <div class="print-row"><span>Ordered On:</span> <span id="kot-date"></span></div>
         <div class="print-divider"></div>
         <div class="print-row print-bold"><span>DELIVER ON:</span> <span id="kot-del"></span></div>
@@ -257,15 +281,25 @@
         <div class="print-row"><span>Name:</span> <span class="print-bold" id="kot-name"></span></div>
         <div class="print-row"><span>Phone:</span> <span id="kot-phone"></span></div>
         <div class="print-divider"></div>
-        <div><span class="print-bold" style="font-size:16px;">SPECS:</span><br><span id="kot-specs"></span></div>
-        <div style="margin-top:5px;"><span>Extras: 2D(<span id="kot-2d"></span>) | 3D(<span id="kot-3d"></span>) | B.Add(<span id="kot-add50"></span>) | P.Add(<span id="kot-add200"></span>)</span></div>
+        
+        <!-- Tabular Specs Fix -->
+        <span class="print-bold">CAKE DETAILS:</span>
+        <table class="specs-table">
+            <tr><td id="kot-cake-desc"></td><td id="kot-cake-weight"></td></tr>
+            <tr><td>Cake Style:</td><td id="kot-cake-style"></td></tr>
+            <tr><td>Sponge:</td><td id="kot-cake-sponge"></td></tr>
+            <tr><td>2D Detail Qty:</td><td id="kot-2d"></td></tr>
+            <tr><td>3D Sculpture Qty:</td><td id="kot-3d"></td></tr>
+            <tr><td>Basic Add-ons:</td><td id="kot-add50"></td></tr>
+            <tr><td>Premium Add-ons:</td><td id="kot-add200"></td></tr>
+        </table>
+        
         <div class="print-divider"></div>
         <div class="print-bold">NOTES / MSG:</div>
         <div id="kot-notes" style="padding:5px; border:1px solid #000; margin-top:5px; min-height:40px;"></div>
         <div class="print-divider"></div>
         <div class="print-bold">SKETCH:</div>
-        <!-- This is where the script injects the drawing just before printing -->
-        <img id="kot-sketch-img" class="print-img" src="" alt="Sketch area">
+        <img id="kot-sketch-img" class="print-img" src="" alt="No sketch">
         <div id="kot-images-container"></div>
     </div>
 
@@ -282,8 +316,18 @@
             }
         };
 
-        let activeData = JSON.parse(localStorage.getItem('hindustanV7')) || defaultData;
+        let activeData = JSON.parse(localStorage.getItem('hindustanV8')) || defaultData;
+        let orderHistory = JSON.parse(localStorage.getItem('hindustanHistory')) || [];
         let uploadedImages = [];
+        let advanceManualOverride = false; // Tracks if user typed a custom advance
+
+        // ID GENERATOR
+        function generateOrderID() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('calc-order').value = "HB" + randomNum;
+            document.getElementById('doc-title').innerText = "HB" + randomNum; // Sets PDF Name
+            advanceManualOverride = false; // Reset override flag for new order
+        }
 
         // CANVAS LOGIC (Touch & Mouse)
         const canvas = document.getElementById('sketchpad');
@@ -295,7 +339,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = "black";
         }
-        window.onload = initCanvas;
+        window.onload = () => { initCanvas(); generateOrderID(); };
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
@@ -323,6 +367,7 @@
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active'); document.getElementById(tabName).classList.add('active');
             if(tabName === 'admin') loadAdminFields();
+            if(tabName === 'history') loadHistoryFields();
         }
 
         function adj(id, amount) {
@@ -340,6 +385,11 @@
                 let opt = document.createElement('option'); opt.value = f; opt.innerText = f; dropdown.appendChild(opt);
             }
             if(activeData.flavors[styleKey][current]) dropdown.value = current;
+        }
+
+        function manuallySetAdvance() {
+            advanceManualOverride = true;
+            calcBalance();
         }
 
         function runQuote() {
@@ -361,8 +411,12 @@
             let total = baseTotal + designTotal;
             document.getElementById('out-total').value = total;
             
+            // Auto-suggest exactly 50% only if the user hasn't typed a custom amount
             let advInput = document.getElementById('calc-advance');
-            if(parseFloat(advInput.value) === 0 && total > 0) advInput.value = total / 2;
+            if (!advanceManualOverride) {
+                advInput.value = total / 2;
+            }
+            
             calcBalance();
         }
 
@@ -370,6 +424,40 @@
             let total = parseFloat(document.getElementById('out-total').value) || 0;
             let adv = parseFloat(document.getElementById('calc-advance').value) || 0;
             document.getElementById('out-balance').value = Math.max(0, total - adv);
+        }
+
+        // HISTORY LOGIC
+        function saveOrderToHistory(orderData) {
+            // Prevent duplicate saves of the same order ID when printing Customer & KOT receipts
+            const exists = orderHistory.findIndex(o => o.id === orderData.id);
+            if (exists !== -1) {
+                orderHistory[exists] = orderData; // Update existing
+            } else {
+                orderHistory.unshift(orderData); // Add new to top
+            }
+            // Keep only the last 50 orders to save iPad memory
+            if(orderHistory.length > 50) orderHistory.pop();
+            localStorage.setItem('hindustanHistory', JSON.stringify(orderHistory));
+        }
+
+        function loadHistoryFields() {
+            let listDiv = document.getElementById('history-list'); listDiv.innerHTML = '';
+            if(orderHistory.length === 0) { listDiv.innerHTML = "<p>No recent orders saved.</p>"; return; }
+            
+            orderHistory.forEach(order => {
+                listDiv.innerHTML += `
+                <div class="history-card">
+                    <div class="history-header"><span>${order.id}</span><span>${order.date}</span></div>
+                    <div><b>${order.name}</b> (${order.phone})</div>
+                    <div style="font-size:14px; margin-top:5px;">Total: ₹${order.total} | Adv: ₹${order.adv} | Bal: ₹${order.bal}</div>
+                </div>`;
+            });
+        }
+        
+        function clearHistory() {
+            if(confirm("Delete all saved orders? This cannot be undone.")) {
+                orderHistory = []; localStorage.removeItem('hindustanHistory'); loadHistoryFields();
+            }
         }
 
         // ADMIN LOGIC
@@ -427,7 +515,7 @@
                     if(el) activeData.flavors[cat][f] = parseInt(el.value) || 0;
                 }
             });
-            localStorage.setItem('hindustanV7', JSON.stringify(activeData)); 
+            localStorage.setItem('hindustanV8', JSON.stringify(activeData)); 
             alert("Admin Settings Saved."); updateFlavorList(); runQuote();
         }
 
@@ -442,17 +530,19 @@
                 let img = document.createElement('img'); img.src = url; img.className = 'preview-thumb';
                 container.appendChild(img);
             }
-            e.target.value = ""; // Reset file input so same file can be tapped again
+            e.target.value = ""; 
         }
         
-        function clearImages() {
-            uploadedImages = []; document.getElementById('img-preview-container').innerHTML = '';
-        }
+        function clearImages() { uploadedImages = []; document.getElementById('img-preview-container').innerHTML = ''; }
 
         // PRINT ENGINE
         function printAction(type) {
             let now = new Date().toLocaleString();
-            let orderNo = document.getElementById('calc-order').value || "WALK-IN";
+            let orderNo = document.getElementById('calc-order').value;
+            
+            // Set dynamic page title for PDF Save Name
+            document.title = orderNo; 
+            
             let cName = document.getElementById('calc-name').value || "No Name";
             let cPhone = document.getElementById('calc-phone').value || "No Number";
             let cDelDate = document.getElementById('calc-del-date').value || "TBD";
@@ -462,25 +552,40 @@
             let flavor = document.getElementById('calc-flavor').value;
             let style = document.getElementById('calc-style').options[document.getElementById('calc-style').selectedIndex].text;
             let sponge = document.getElementById('calc-sponge').options[document.getElementById('calc-sponge').selectedIndex].text;
-            let specsText = `${kg}kg ${flavor} (${style} - ${sponge})`;
+            
+            let gTotal = document.getElementById('out-total').value;
+            let gAdv = document.getElementById('calc-advance').value;
+            let gBal = document.getElementById('out-balance').value;
+
+            // Save Snapshot to History
+            saveOrderToHistory({ id: orderNo, date: now, name: cName, phone: cPhone, total: gTotal, adv: gAdv, bal: gBal });
 
             if (type === 'customer') {
                 document.getElementById('rcpt-order').innerText = orderNo; document.getElementById('rcpt-date').innerText = now;
                 document.getElementById('rcpt-name').innerText = cName; document.getElementById('rcpt-phone').innerText = cPhone;
                 document.getElementById('rcpt-del-date').innerText = cDelDate; document.getElementById('rcpt-del-time').innerText = cDelTime;
-                document.getElementById('rcpt-specs').innerText = specsText;
-                document.getElementById('rcpt-total').innerText = "₹" + document.getElementById('out-total').value;
-                document.getElementById('rcpt-adv').innerText = "₹" + document.getElementById('calc-advance').value;
-                document.getElementById('rcpt-bal').innerText = "₹" + document.getElementById('out-balance').value;
+                
+                document.getElementById('rcpt-cake-desc').innerText = flavor;
+                document.getElementById('rcpt-cake-weight').innerText = kg + "kg";
+                document.getElementById('rcpt-cake-style').innerText = style;
+                document.getElementById('rcpt-cake-sponge').innerText = sponge;
+
+                document.getElementById('rcpt-total').innerText = "₹" + gTotal;
+                document.getElementById('rcpt-adv').innerText = "₹" + gAdv;
+                document.getElementById('rcpt-bal').innerText = "₹" + gBal;
                 
                 document.body.className = "print-customer"; 
                 window.print();
-                setTimeout(() => { document.body.className = ""; }, 500);
+                setTimeout(() => { document.body.className = ""; document.title = "Hindustan Bakery KOT"; }, 500);
             } else if (type === 'kot') {
                 document.getElementById('kot-order').innerText = orderNo; document.getElementById('kot-date').innerText = now;
                 document.getElementById('kot-del').innerText = `${cDelDate} @ ${cDelTime}`;
                 document.getElementById('kot-name').innerText = cName; document.getElementById('kot-phone').innerText = cPhone;
-                document.getElementById('kot-specs').innerText = specsText;
+                
+                document.getElementById('kot-cake-desc').innerText = flavor;
+                document.getElementById('kot-cake-weight').innerText = kg + "kg";
+                document.getElementById('kot-cake-style').innerText = style;
+                document.getElementById('kot-cake-sponge').innerText = sponge;
                 
                 document.getElementById('kot-2d').innerText = document.getElementById('calc-2d').value;
                 document.getElementById('kot-3d').innerText = document.getElementById('calc-3d').value;
@@ -491,22 +596,24 @@
                 let kotImgContainer = document.getElementById('kot-images-container'); kotImgContainer.innerHTML = '';
                 uploadedImages.forEach(url => { let img = document.createElement('img'); img.src = url; img.className = 'print-img'; kotImgContainer.appendChild(img); });
 
-                // Capture Sketch & Delay Print to allow rendering
                 document.getElementById('kot-sketch-img').src = canvas.toDataURL("image/png");
                 document.body.className = "print-kot";
                 
                 setTimeout(() => {
                     window.print();
-                    setTimeout(() => { document.body.className = ""; }, 500); 
-                }, 300); // 0.3s delay guarantees the sketch appears on the print
+                    setTimeout(() => { document.body.className = ""; document.title = "Hindustan Bakery KOT"; }, 500); 
+                }, 300);
             }
         }
 
         function resetForm() {
             if(confirm("Clear all fields and start a new order?")) {
-                document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea').forEach(i => i.value = '');
-                document.getElementById('calc-weight').value = 1; document.getElementById('calc-advance').value = 0;
-                clearImages(); clearCanvas(); updateFlavorList(); runQuote(); switchTab('order');
+                document.querySelectorAll('input[type="text"], input[type="number"]:not(#calc-advance):not(#calc-weight), input[type="date"], input[type="time"], textarea').forEach(i => i.value = '');
+                document.getElementById('calc-weight').value = 1; 
+                document.getElementById('calc-advance').value = 0;
+                clearImages(); clearCanvas(); updateFlavorList(); 
+                generateOrderID(); // Create new ID for the new order
+                runQuote(); switchTab('order');
             }
         }
 
@@ -514,4 +621,3 @@
     </script>
 </body>
 </html>
-<!-- Retrying the deployment -->
